@@ -130,7 +130,6 @@ function AddEmployees() {
               navigate('/employees');
             }).catch((error)=>{
               if(error.response){ 
-                seterrormessage(error.response.data);
                 if(error.response.data!=undefined){
                 seterrormessage(error.response.data["message"]);
                 swal("Oho! \n"+error.response.data["message"], {
