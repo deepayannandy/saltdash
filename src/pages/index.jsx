@@ -14,4 +14,4 @@ export { default as ClientDetails } from './ClientDetails';
 export { default as Employees } from './Employees';
 export { default as Membership } from './Membership';
 export { default as Packages } from './Packages';
-export { default as page404 } from './page404';
+export { default as Page404 } from './page404';

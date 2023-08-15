@@ -1,10 +1,9 @@
 import React,{useEffect}  from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import {Dashboard,Appointment,Services, Customers, Login, ForgotPassword,AddAppointment,AddClients,AddEmployees,AddMemberships,AddPackages,AddServices,Membership,Packages,Employees, page404} from "./pages"
+import {Dashboard,Appointment,Services, Customers, Login, ForgotPassword,AddAppointment,AddClients,AddEmployees,AddMemberships,AddPackages,AddServices,Membership,Packages,Employees, Page404,ClientDetails} from "./pages"
 import { Header,Sidebar } from './components';
 import { useStateContext } from './contexts/ContextProvider';
-import Page404 from './pages/page404';
 
 const App = () => {
     const { isLogin , setisLogin}=useStateContext();
@@ -43,6 +42,7 @@ const App = () => {
               <Route path='/Membership' element={<Membership/>}/>
               <Route path='/Packages' element={<Packages/>}/>
               <Route path='/Employees' element={<Employees/>}/>
+              <Route path='/customerdetails' element={<ClientDetails/>}/>
               <Route path='*' element={<Page404/>}/>
             </Routes>
             </div>
