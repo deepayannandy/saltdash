@@ -20,7 +20,7 @@ const App = () => {
         {isLogin?
           <Sidebar/>
         :<div/>}
-      <div className='flex-1'>
+      <div className='flex-1  top-0'>
       {isLogin?
           <Header/>
         :<div/>}

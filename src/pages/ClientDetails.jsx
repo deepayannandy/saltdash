@@ -4,8 +4,24 @@ import swal from 'sweetalert';
 import { useNavigate ,useSearchParams} from 'react-router-dom'
 import { Header,Shows,} from '../form_components'
 import Divider from '@mui/material/Divider';
+import {AppBar, Tab,Tabs} from "@material-ui/core"
+import {
+  GridComponent,
+  ColumnDirective,
+  ColumnsDirective,
+  Page,
+  Inject,
+  Filter,
+  Sort,ContextMenu,
+  Edit,
+  Toolbar,
+  InfiniteScroll,
+  Resize,ExcelExport, PdfExport,Search
+} from '@syncfusion/ej2-react-grids';
 
 function ClientDetails() {
+    let grid;
+    const toolbarOptions = ['Search','ExcelExport','PdfExport'];
     const navigate= useNavigate();
     const [clienttype, setclienttype] = React.useState("Individual");
     const [rdata] =  useSearchParams();
@@ -24,6 +40,26 @@ function ClientDetails() {
     const  [CompanyTradeName, setCompanyTradeName]= React.useState("");
     const  [BillingAddress, setBillingAddress]= React.useState("");
     const  [ShippingAddress, setShippingAddress]= React.useState("");
+    const  [tabindex, settabindex]= React.useState(0);
+    const [servicedata, setservicedata] = React.useState([]);
+    const showQR = (props) => (
+      <div className='flex'><button
+        name="buttonedit"
+        style={{ background: "#008000" }}
+        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
+      >
+       Edit
+      </button>
+      <div className='w-5'/>
+      <button
+        name="buttondelete"
+        style={{ background: "#B22222" }}
+        className="edititem text-white py-1 px-2 capitalize rounded-2xl text-md"
+      >
+       Delete
+      </button>
+      </div>
+    );
     const deleteclientdata=()=>{
         swal({
             title: "Are you sure?",
@@ -76,9 +112,12 @@ function ClientDetails() {
     useEffect(()=>{
       getclientsdata()
     },[])
+    function handletabchange(e,val){
+      settabindex(val)
+    }
       return (
         <div class="grid grid-flow-row-auto grid-cols-3  gap-4 w-auto">
-            <div class="col-span-2 border bg-white rounded-md shadow-md p-5 ">
+            <div class="col-span-3 border bg-white rounded-md shadow-md p-5 ">
                <div className='flow-root'>
                     <div className='float-left'><Header category="" title= " Client Details" /> </div>
                     <button type="button" onClick={deleteclientdata} class=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700">Delete</button>
@@ -113,13 +152,152 @@ function ClientDetails() {
                         <textarea name="BillingAddress" placeholder="BillingAddress" className="shadow appearance-none border border-grey-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" value={BillingAddress}/>
                         </div>
                     </div>
+                    <AppBar position="static" color='bg-teal-600'>
+                    <Tabs value={tabindex} onChange={handletabchange}>
+                      <Tab label="Memberships"/>
+                      <Tab label="Purchases"/>
+                      <Tab label="Recent Appointments"/>
+                      <Tab label="Credits"/>
+                    </Tabs>
+                    </AppBar>
+                    <div className={tabindex==0?"visible":"hidden"}>
+                      <div className='flex-row g p-2 gap-2'>
+                       <span className='p-4 font-weight: inherit; text-2xl'>Memberships</span>
+                      <div className="pt-2"> <GridComponent dataSource={servicedata}
+                          allowPaging={true}
+                          ref={g => grid = g}
+                          pageSettings={{ pageSize: 10 }}
+                          // editSettings={editing}
+                          toolbar={toolbarOptions}
+                          // actionComplete={actionComplete}
+                          // toolbarClick={toolbarClick}
+                          // recordClick={recordClick}
+                          // height= {500}
+                          // width= {950}
+                          enableInfiniteScrolling= {true}
+                          infiniteScrollSettings= {{ initialBlocks: 5 }}
+                          allowResizing= {true}
+                        >
+                          <ColumnsDirective>
+                            {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+                            <ColumnDirective field='MembershipName' headerText='Membership Name' width='80' />
+                            <ColumnDirective field='ServiceCategory' headerText='Start Date' width='80' />
+                            <ColumnDirective field='ServiceDescription' headerText='End Date' width='80' />
+                            <ColumnDirective field='Duration' headerText='isValid' width='100'/>
+                            <ColumnDirective field='ServiceCost' headerText='Total Scession' width='80' />
+                            <ColumnDirective field='SellingCost' headerText='Scession Left' width='80' />
+                            <ColumnDirective field='HsnCode' headerText='Hsn Code' width='80'/>
+                            <ColumnDirective field='IncludeTax' headerText='Cost' width='80'/>
+                            <ColumnDirective field='_id' headerText='Action' minWidth= '100' width= '80' maxWidth= '300' isPrimaryKey={true} template={showQR}/>
+                          </ColumnsDirective>
+                          <Inject services={[Page, Edit, Toolbar, InfiniteScroll,Resize, Sort, ContextMenu, Filter, ExcelExport, Edit, PdfExport,Search, Resize]} />
+                        </GridComponent>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={tabindex==1?"visible":"hidden"}>
+                    <div className='flex-row g p-2 gap-2'>
+                       <span className='p-4 font-weight: inherit; text-2xl'>Purchases</span>
+                      <div className="pt-2"> <GridComponent dataSource={servicedata}
+                          allowPaging={true}
+                          ref={g => grid = g}
+                          pageSettings={{ pageSize: 10 }}
+                          // editSettings={editing}
+                          toolbar={toolbarOptions}
+                          // actionComplete={actionComplete}
+                          // toolbarClick={toolbarClick}
+                          // recordClick={recordClick}
+                          // height= {500}
+                          // width= {950}
+                          enableInfiniteScrolling= {true}
+                          infiniteScrollSettings= {{ initialBlocks: 5 }}
+                          allowResizing= {true}
+                        >
+                          <ColumnsDirective>
+                            {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+                            <ColumnDirective field='MembershipName' headerText='Invoice N0.' width='80' />
+                            <ColumnDirective field='ServiceCategory' headerText='Purchase Date' width='80' />
+                            <ColumnDirective field='ServiceDescription' headerText='Qnt' width='80' />
+                            <ColumnDirective field='Duration' headerText='Total Value' width='100'/>
+                            <ColumnDirective field='ServiceCost' headerText='Mode of Payment' width='80' />
+                            <ColumnDirective field='_id' headerText='Action' minWidth= '100' width= '80' maxWidth= '300' isPrimaryKey={true} template={showQR}/>
+                          </ColumnsDirective>
+                          <Inject services={[Page, Edit, Toolbar, InfiniteScroll,Resize, Sort, ContextMenu, Filter, ExcelExport, Edit, PdfExport,Search, Resize]} />
+                        </GridComponent>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={tabindex==2?"visible":"hidden"}>
+                    <div className='flex-row g p-2 gap-2'>
+                       <span className='p-4 font-weight: inherit; text-2xl'>Recent Appointments</span>
+                      <div className="pt-2"> <GridComponent dataSource={servicedata}
+                          allowPaging={true}
+                          ref={g => grid = g}
+                          pageSettings={{ pageSize: 10 }}
+                          // editSettings={editing}
+                          toolbar={toolbarOptions}
+                          // actionComplete={actionComplete}
+                          // toolbarClick={toolbarClick}
+                          // recordClick={recordClick}
+                          // height= {500}
+                          // width= {950}
+                          enableInfiniteScrolling= {true}
+                          infiniteScrollSettings= {{ initialBlocks: 5 }}
+                          allowResizing= {true}
+                        >
+                          <ColumnsDirective>
+                            {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+                            <ColumnDirective field='ServiceCost' headerText='Appointment Details' width='80' />
+                            <ColumnDirective field='MembershipName' headerText='Date' width='80' />
+                            <ColumnDirective field='ServiceCategory' headerText='Start Time' width='80' />
+                            <ColumnDirective field='ServiceDescription' headerText='End Time' width='80' />
+                            <ColumnDirective field='Duration' headerText='Person Count' width='100'/>
+                            <ColumnDirective field='_id' headerText='Action' minWidth= '100' width= '80' maxWidth= '300' isPrimaryKey={true} template={showQR}/>
+                          </ColumnsDirective>
+                          <Inject services={[Page, Edit, Toolbar, InfiniteScroll,Resize, Sort, ContextMenu, Filter, ExcelExport, Edit, PdfExport,Search, Resize]} />
+                        </GridComponent>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={tabindex==3?"visible":"hidden"}>
+                    <div className='flex-row g p-2 gap-2'>
+                       <span className='p-4 font-weight: inherit; text-2xl'>Credits</span>
+                      <div className="pt-2"> <GridComponent dataSource={servicedata}
+                          allowPaging={true}
+                          ref={g => grid = g}
+                          pageSettings={{ pageSize: 10 }}
+                          // editSettings={editing}
+                          toolbar={toolbarOptions}
+                          // actionComplete={actionComplete}
+                          // toolbarClick={toolbarClick}
+                          // recordClick={recordClick}
+                          // height= {500}
+                          // width= {950}
+                          enableInfiniteScrolling= {true}
+                          infiniteScrollSettings= {{ initialBlocks: 5 }}
+                          allowResizing= {true}
+                        >
+                          <ColumnsDirective>
+                            {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+                            <ColumnDirective field='ServiceCost' headerText='Issue Date' width='80' />
+                            <ColumnDirective field='MembershipName' headerText='Expire Date' width='80' />
+                            <ColumnDirective field='ServiceCategory' headerText='Credit Amount' width='80' />
+                            <ColumnDirective field='ServiceDescription' headerText='Status' width='80' />
+                            <ColumnDirective field='Duration' headerText='Generate on behalf' width='100'/>
+                            <ColumnDirective field='_id' headerText='Action' minWidth= '100' width= '80' maxWidth= '300' isPrimaryKey={true} template={showQR}/>
+                          </ColumnsDirective>
+                          <Inject services={[Page, Edit, Toolbar, InfiniteScroll,Resize, Sort, ContextMenu, Filter, ExcelExport, Edit, PdfExport,Search, Resize]} />
+                        </GridComponent>
+                        </div>
+                      </div>
+                    </div>
                
             </div>
-            <div class="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
+            {/* <div class="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
             <Header category="" title= "Purchase History" />
             <Divider className='p-1'/>
             <label class="block text-gray-700 text-sm  py-2  font-bold mb-2">No data found !</label>
-            </div>
+            </div> */}
         </div>
       );
   }
