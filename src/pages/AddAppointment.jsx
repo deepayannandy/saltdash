@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useNavigate ,useSearchParams} from 'react-router-dom'
 import { Input,Header,InputSelect,MembershipCard,InputSelectFilter, InputSearch} from '../form_components'
 import swal from 'sweetalert';
+import { BsArrowLeftShort } from 'react-icons/bs'
 
 
 
@@ -275,7 +276,8 @@ const inputs=[
           <p>{errormessage}</p>
           </div>:<div/>}
         <form onSubmit={handleSubmit} className=' bg-white p-8 px-8 rounded-lg'>
-        <Header category="Page" title={rdata.get("id")=="new"? "Schedule an Appointment":"Reschedule"}/>
+        <BsArrowLeftShort style={{left:"107px",}} className="text-gray-700 text-3xl mt-5  absolute left-23.1 top-20 cursor-pointer " onClick={() => navigate(-1)} />
+        <Header title={rdata.get("id")=="new"? "Schedule an Appointment":"Reschedule"}/>
         <div className=' grid justify-items-stretch grid-cols-3 gap-4'>
         <div class="col-span-2 ..."> <InputSearch options={clientlist} value="Select" name="Client" placeholder="Client" onchange={handelclientselect} defaultvalue={searchdata} onInputChange={handleinputchange} /></div>
         {selectedClient!=null? selectedClient.Memberships!=undefined? <MembershipCard title={selectedClient.Memberships.MembershipName}  ></MembershipCard>: <MembershipCard title={"No Membership found"}/>:<div/>}

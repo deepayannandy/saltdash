@@ -2,6 +2,7 @@ import React , { useEffect, useState } from 'react';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Input,Header,InputSelect} from '../form_components'
+import { BsArrowLeftShort } from 'react-icons/bs'
 
 function AddMemberships() {
   const editing ={allowEditing: true};
@@ -166,7 +167,8 @@ function AddMemberships() {
           <p>{errormessage}</p>
           </div>:<div/>}
         <form onSubmit={handleSubmit} className=' bg-white p-8 px-8 rounded-lg'>
-        <Header category="Page" title="Crearte a new Membership" />
+        <BsArrowLeftShort style={{left:"107px"}} className="text-gray-700 text-3xl mt-5 absolute left-23.1 top-20 cursor-pointer" onClick={() => navigate(-1)} />
+        <Header title="Create a new Membership" />
         <div className=' grid justify-items-stretch grid-cols-2 gap-4'>
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <InputSelect name="Branch" placeholder="Membership Branch" options={branchs}></InputSelect>

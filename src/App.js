@@ -4,6 +4,7 @@ import './App.css';
 import {Dashboard,Appointment,Services, Customers, Login, ForgotPassword,AddAppointment,AddClients,AddEmployees,AddMemberships,AddPackages,AddServices,Membership,Packages,Employees, Page404,ClientDetails} from "./pages"
 import { Header,Sidebar } from './components';
 import { useStateContext } from './contexts/ContextProvider';
+import "./assets/css/style.css";
 
 const App = () => {
     const { isLogin , setisLogin}=useStateContext();
@@ -16,7 +17,7 @@ const App = () => {
   return (
     <div>
         <BrowserRouter>
-            <div className='flex relative bg-neutral-100 w-screen h-screen'>
+            <div className='flex relative bg-neutral-100' style={{paddingLeft: "5vw"}}>
         {isLogin?
           <Sidebar/>
         :<div/>}

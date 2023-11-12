@@ -1,0 +1,20 @@
+.react-datepicker__calendar-icon {
+    top: 3px;
+}
+
+.inputDateClass {
+    border: 2px solid grey;
+    border-radius: 10px;
+}
+.selctbox_for_location{
+    margin-right: 10px;
+    display: inline-flex;
+}
+.selctbox_for_location label{
+    margin-top: 8px;
+    margin-right: 13px;
+    /*display:none !important;*/
+}
+.selctbox_for_location .uppercase.tracking-wide{
+    display:none !important;
+}

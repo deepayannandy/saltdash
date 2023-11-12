@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useNavigate ,useSearchParams} from 'react-router-dom'
 import { Input,Header,InputSelect} from '../form_components'
 import swal from 'sweetalert';
+import { BsArrowLeftShort } from 'react-icons/bs'
 
 
 function AddServices() {
@@ -197,7 +198,8 @@ const inputs=[
           <p>{errormessage}</p>
           </div>:<div/>}
         <form onSubmit={handleSubmit} className=' bg-white p-8 px-8 rounded-lg'>
-        <Header category="Page" title={rdata.get("id")=="new"? "Crearte a new service":"Edit Service"}/>
+        <BsArrowLeftShort style={{left:"107px"}} className="text-gray-700 text-3xl mt-5 absolute left-23.1 top-20 cursor-pointer" onClick={() => navigate(-1)} />
+        <Header title={rdata.get("id")=="new"? "Create a new service":"Edit Service"}/>
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <label class="block text-gray-700 text-sm font-bold mb-2">ServiceDescription</label>
           <textarea name="ServiceDescription" value={ServiceDescription} onChange={((event)=>{ setServiceDescription(event.target.value)})} placeholder="Service Description" className="shadow appearance-none border border-grey-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"/>

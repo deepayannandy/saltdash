@@ -21,7 +21,7 @@ function Sidebar() {
   }
   
   return (
-    <div className={`bg-gray-700  p-3 flex flex-col text-white relative duration-300 ${open ? "w-72" : "w-20"}`} >
+    <div className={`bg-gray-700  p-3 flex flex-col text-white relative duration-300 ${open ? "w-72" : "w-20"}`} style={{height: "100vh", position: "fixed", zIndex:"999", left: "0", top:"0"}} >
     <BsArrowLeftShort className={`bg-white text-gray-700 text-3xl rounded-full absolute -right-3  shadow-5xl shadow-inner top-20 border border-teal-300 cursor-pointer ${!open && "rotate-180"}`} onClick={() => setOpen(!open)} />
         <div className={`flex items-center gap-3 px-1 py-3 duration-300 `}>
         <img className='' src={open?LogoImg:miniLogoImg} alt=''/>

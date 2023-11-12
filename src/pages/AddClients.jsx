@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Input,Header,InputSelect} from '../form_components'
 import { useNavigate ,useSearchParams} from 'react-router-dom'
 import swal from 'sweetalert';
+import { BsArrowLeftShort } from 'react-icons/bs'
 
 function AddClients() {
   const navigate= useNavigate();
@@ -246,7 +247,8 @@ const inputs=[
           <p>{errormessage}</p>
           </div>:<div/>}
         <form onSubmit={handleSubmit} className=' bg-white p-8 px-8 rounded-lg'>
-        <Header category="Page" title= {rdata.get("id")=="new"?"Crearte a new Client":"Edit Client Details"} />
+        <BsArrowLeftShort style={{left:"107px"}} className="text-gray-700 text-3xl mt-5 absolute left-23.1 top-20 cursor-pointer" onClick={() => navigate(-1)} />
+        <Header title= {rdata.get("id")=="new"?"Create a new Client":"Edit Client Details"} />
         <div className=' grid justify-items-stretch grid-cols-2 gap-4'>
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <Input key={inputs[1].id} {...inputs[1]}></Input>
