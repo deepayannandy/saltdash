@@ -81,7 +81,7 @@ function Employees() {
     }
   }
   const recordClick = (args) => {
-    if(args.target.name==="buttonstatus"){
+    if (args.target.name === "buttonstatus") {
       let rowObj = grid.getRowObjectFromUID(closest(args.target, '.e-row').getAttribute('data-uid'));
       swal({
         title: "Are you sure?",
