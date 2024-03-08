@@ -5,124 +5,101 @@ import { Input, Header, InputSelect } from "../form_components";
 import { BsArrowLeftShort } from "react-icons/bs";
 
 function AddMemberships() {
-  const editing = { allowEditing: true };
   const navigate = useNavigate();
-  const [errormessage, seterrormessage] = React.useState([]);
+  const [errorMessage, setErrorMessage] = React.useState([]);
   const toolbarOptions = ["Search", "ExcelExport", "PdfExport", "Edit"];
-  const [userid, setuserid] = React.useState([]);
-  const [branchs, setbranchs] = React.useState([]);
-  const [services, setservices] = React.useState([]);
-  const [servicename, setservicename] = React.useState([]);
-  const [selectedservice, setselectedservice] = React.useState([]);
-  const [srs, setsrs] = React.useState(new Map());
-  const [count, setcount] = useState(0);
-  const [isun, setisun] = useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [services, setServices] = React.useState([]);
+  const [serviceName, setServiceName] = React.useState([]);
+  const [selectedService, setSelectedService] = React.useState([]);
+  const [srs, setSrs] = React.useState(new Map());
+  const [count, setCount] = useState(0);
+  const [isUnlimited, setIsUnlimited] = useState(false);
+  const [selectedServiceName, setSelectedServiceName] = useState('');
   //const [searchParams] = useSearchParams();
 
-  const handlecountChange = (event) => {
-    setcount(event.target.value);
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  let service = new Map();
+  const token = localStorage.getItem("userinfo");
+
+  const handleCountChange = (event) => {
+    setCount(event.target.value);
   };
-  let selected = "";
-  var service = new Map();
+
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
       navigate("/Login");
     }
-    let token = localStorage.getItem("userinfo");
-    setuserid(token);
   });
-  const getservicedata = () => {
-    axios.get("https://devapi.saltworld.co/api/services/").then((response) => {
-      setservices(response.data);
-      let servicen = ["Select"];
-      for (let services in response.data) {
-        service.set(
-          response.data[services].ServiceName,
-          response.data[services]
-        );
-        servicen.push(response.data[services].ServiceName);
-      }
-      setservicename(servicen);
-      console.log(service);
-      setsrs(service);
-    });
+
+  const getServiceData = () => {
+    axios
+      .get(`${baseUrl}/api/services/`, {
+        headers: { "auth-token": token },
+      })
+      .then((response) => {
+        setServices(response.data);
+        let servicesList = ["Select"];
+        for (let services in response.data) {
+          service.set(response.data[services].name, response.data[services]);
+          servicesList.push(response.data[services].name);
+        }
+        setServiceName(servicesList);
+        setSrs(service);
+      });
   };
+
   useEffect(() => {
-    getservicedata();
-    //getClientMembershipData();
+    getServiceData();
   }, []);
 
-    // const getClientMembershipData = () => {
-    //   if (rdata.get("id") != "new") {
-    //     axios
-    //       .get(
-    //         "https://devapi.saltworld.co/api/client_membership/" + rdata.get("id").toString()
-    //       )
-    //       .then((response) => {
-    //         setfirstname(response.data.FirstName);
-    //         setlastname(response.data.LastName);
-    //         setemail(response.data.email);
-    //         setmob(response.data.mobile);
-    //       })
-    //       .catch((e) => {
-    //         swal("Oho! \n" + e, {
-    //           icon: "error",
-    //         });
-    //       });
-    //   }
-    // };
-    useEffect(() => {
-    }, []);
-  
-  useEffect(() => {
-    if (!localStorage.getItem("userinfo")) {
-      // console.log("try")
-      navigate("/Login");
-    }
-    let token = localStorage.getItem("userinfo");
-    console.log(token);
-  });
-  const getbranchList = () => {
-    axios.get("https://devapi.saltworld.co/api/branchs/").then((response) => {
-      let cllist = [];
-      for (let client in response.data) {
-        cllist.push(response.data[client].BranchName);
-      }
-      // console.log(cllist)
-      setbranchs(cllist);
-    });
+
+  const getBranchList = () => {
+    axios
+      .get(`${baseUrl}/api/branches/`, {
+        headers: { "auth-token": token },
+      })
+      .then((response) => {
+        const clientList = [];
+        for (let client in response.data) {
+          clientList.push(response.data[client].BranchName);
+        }
+        setBranches(clientList);
+      });
   };
+
   useEffect(() => {
-    getbranchList();
+    getBranchList();
   }, []);
+
   const inputs = [
     {
       id: 1,
-      name: "MembershipName",
+      name: "name",
       type: "text",
       placeholder: "Membership Name",
     },
     {
       id: 2,
-      name: "MembershipCost",
+      name: "cost",
       type: "number",
       placeholder: "Membership Cost",
     },
     {
       id: 3,
-      name: "SellingCost",
+      name: "sellingCost",
       type: "number",
       placeholder: "Selling Cost",
     },
     {
       id: 4,
-      name: "HsnCode",
+      name: "hsnCode",
       type: "text",
       placeholder: "HSN Code",
     },
     {
       id: 5,
-      name: "Taxrate",
+      name: "taxRate",
       type: "number",
       placeholder: "Tax",
     },
@@ -131,12 +108,12 @@ function AddMemberships() {
       name: "count",
       type: "number",
       value: count,
-      onChange: handlecountChange,
+      onChange: handleCountChange,
       placeholder: "Count",
     },
     {
       id: 7,
-      name: "isunlimited",
+      name: "isUnlimited",
       type: "checkbox",
     },
     {
@@ -145,64 +122,60 @@ function AddMemberships() {
       type: "number",
       placeholder: "Validity",
     },
-
-    ,
   ];
+
   const handleSubmit = async (e) => {
-    seterrormessage("");
+    setErrorMessage("");
     e.preventDefault();
     const data = new FormData(e.target);
-    let recievedData = Object.fromEntries(data.entries());
-    recievedData.Services = selectedservice;
-    recievedData.isunlimited = isun;
-    console.log(recievedData);
+    let receivedData = Object.fromEntries(data.entries());
+    receivedData.serviceIds = selectedService.map((service) => service._id);
+    receivedData.isUnlimited = isUnlimited;
     axios
-      .post("http://localhost:6622/api/memberships", recievedData, {
+      .post(`${baseUrl}/api/memberships`, receivedData, {
         headers: {
           "Content-type": "application/json; charset=UTF-8",
-          "auth-token": userid,
+          "auth-token": token,
         },
       })
-      .then((data) => {
+      .then(() => {
         navigate("/membership");
       })
       .catch((error) => {
         if (error.response) {
-          seterrormessage(error.response.data);
-          if (error.response.data["message"] != undefined) {
-            seterrormessage(error.response.data["message"]);
+          setErrorMessage(error.response.data);
+          if (error.response.data["message"] !== undefined) {
+            setErrorMessage(error.response.data["message"]);
           }
         }
       });
   };
-  const setService = (e) => {
-    selected = e.target.value;
-  };
-  const addequipments = (e) => {
-    if (selected.length > 1 && selected != "Select") {
-      console.log(selected);
-      let servicewithcount = srs.get(selected);
-      servicewithcount.count = count;
-      setcount(0);
-      setselectedservice([...selectedservice, servicewithcount]);
+
+  const addEquipments = (e) => {
+    console.dir({ srs }, { depth: 10 });
+    if (selectedServiceName.length > 1 && selectedServiceName !== "Select") {
+      const serviceWithCount = srs.get(selectedServiceName);
+      serviceWithCount.count = count;
+      setCount(0);
+      setSelectedService([...selectedService, serviceWithCount]);
     }
   };
 
   return (
     // <div className="flex flex-row gap-1">
     <div className="  justify-center">
-      {errormessage.length > 0 ? (
+      {errorMessage.length > 0 ? (
         <div
           class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 "
           role="alert"
         >
           <p class="font-bold">Something Went Wrong</p>
-          <p>{errormessage}</p>
+          <p>{errorMessage}</p>
         </div>
       ) : (
         <div />
       )}
-      <form onSubmit={handleSubmit} className=" bg-white p-8 px-8 rounded-lg">
+      <form onSubmit={handleSubmit} className="bg-white p-8 px-8 rounded-lg">
         <BsArrowLeftShort
           style={{ left: "107px" }}
           className="text-gray-700 text-3xl mt-5 absolute left-23.1 top-20 cursor-pointer"
@@ -212,9 +185,9 @@ function AddMemberships() {
         <div className=" grid justify-items-stretch grid-cols-2 gap-4">
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <InputSelect
-            name="Branch"
+            name="branch"
             placeholder="Membership Branch"
-            options={branchs}
+            options={branches}
           ></InputSelect>
         </div>
         <div className="">
@@ -222,7 +195,7 @@ function AddMemberships() {
             Membership Description
           </label>
           <textarea
-            name="MembershipDescription"
+            name="description"
             placeholder="Membership Description"
             className="shadow appearance-none border border-grey-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
           />
@@ -236,10 +209,10 @@ function AddMemberships() {
           {/* <Input key={inputs[6].id} {...inputs[6]}></Input> */}
           <div class="flex items-center">
             <input
-              name="isunlimited"
-              value={isun}
+              name="isUnlimited"
+              value={isUnlimited}
               onChange={() => {
-                setisun(!isun);
+                setIsUnlimited(!isUnlimited);
               }}
               type="checkbox"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -263,11 +236,11 @@ function AddMemberships() {
             <div class="relative">
               <select
                 name="SelectService"
-                onChange={setService}
+                onChange={(event) => setSelectedServiceName(event.target.value)}
                 class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 mb-2"
                 id="grid-state"
               >
-                {servicename.map((option) => (
+                {serviceName.map((option) => (
                   <option>{option}</option>
                 ))}
               </select>
@@ -286,7 +259,7 @@ function AddMemberships() {
           <button
             className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
             type="button"
-            onClick={addequipments}
+            onClick={addEquipments}
           >
             Add
           </button>
@@ -313,11 +286,11 @@ function AddMemberships() {
               </tr>
             </thead>
             <tbody>
-              {selectedservice.map((sr) => (
+              {selectedService.map((sr) => (
                 <tr>
-                  <td class="border border-slate-700 ...">{sr.ServiceName}</td>
-                  <td class="border border-slate-700 ...">{sr.Duration}</td>
-                  <td class="border border-slate-700 ...">{sr.SellingCost}</td>
+                  <td class="border border-slate-700 ...">{sr.name}</td>
+                  <td class="border border-slate-700 ...">{sr.duration}</td>
+                  <td class="border border-slate-700 ...">{sr.sellingCost}</td>
                   <td class="border border-slate-700 ...">{sr.count}</td>
                 </tr>
               ))}

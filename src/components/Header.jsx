@@ -4,17 +4,16 @@ import { HiOutlineSearch } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
 import classNames from 'classnames'
 import avatar from '../assets/astronaut.png'
-import { useStateContext } from '../contexts/ContextProvider';
 
 function Header() {
     const navigate = useNavigate()
 	const [username, setusername] = React.useState([]);
-	const {isLogin , setisLogin}=useStateContext();
+	
 	useEffect(()=>{
 		let token= localStorage.getItem('username');
 		setusername(token)
-		console.log(token)
-		})
+	}, [])
+	
   return (
     <div className='sticky top-0 bg-teal-600 h-16 px-4 flex justify-between items-center border-b border-gray-300 z-10'>
       <div className='relative'>
@@ -75,7 +74,6 @@ function Header() {
 									<div
                                         onClick={() => {
 											localStorage.clear();
-    										setisLogin(false);
    											navigate('/Login');
 										}}
 										className={classNames(
@@ -91,12 +89,12 @@ function Header() {
 					</Transition>
 				</Menu>
 				<div className='flex'>
-				<label class="block text-gray-200 text-sm font-bold mb-2">Hey, </label>
-				<label class="block text-gray-200 text-sm font-bold mb-2">{username}</label>
+				<label className="block text-gray-200 text-sm font-bold mb-2">Hey, </label>
+				<label className="block text-gray-200 text-sm font-bold mb-2">{username}</label>
 				</div>
             </div>
     </div>
   )
 }
 
-export default Header
+export default Header;

@@ -1,22 +1,21 @@
-import React,{ useEffect, useState } from 'react'
-import DashboardStatsGrid from './DashboardStatsGrid'
-import { useNavigate,createSearchParams,Link } from 'react-router-dom'
+import React, { useEffect } from "react";
+import DashboardStatsGrid from "./DashboardStatsGrid";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
-	const navigate= useNavigate();
-	useEffect(()=>{
-    
-		if (!localStorage.getItem('userinfo')){
-		  console.log("try")
-		  navigate('/Login');
-		}
-		let token= localStorage.getItem('userinfo');
-		console.log(token)
-		})
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("userinfo")) {
+      navigate("/Login");
+    }
+    let token = localStorage.getItem("userinfo");
+    console.log(token);
+  });
+
   return (
     <div className="flex flex-col gap-4">
-			<DashboardStatsGrid />
-			{/* <div className="flex flex-row gap-4 w-full">
+      <DashboardStatsGrid />
+      {/* <div className="flex flex-row gap-4 w-full">
 				<TransactionChart/>
         		<BuyerProfilePieChart />
 			</div>
@@ -24,8 +23,8 @@ function Dashboard() {
           <RecentOrders />
           <PopularProducts />
 			</div> */}
-		</div>
-  )
+    </div>
+  );
 }
 
-export default Dashboard
+export default Dashboard;
