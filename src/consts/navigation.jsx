@@ -5,8 +5,6 @@ import {
 	HiUsers,
 	HiUserGroup,
 	HiOutlineUsers,
-	HiOutlineCube,
-	HiViewBoards,
 	HiCalendar,
 	HiOutlineLogout
 } from 'react-icons/hi'

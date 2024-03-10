@@ -6,17 +6,15 @@ import miniLogoImg from '../assets/mini-logo.png'
 import classNames from 'classnames'
 import { BsArrowLeftShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
-import { useStateContext } from '../contexts/ContextProvider';
 const linkClasses ='flex items-center gap-2 font-light px-3 py-2 hover:bg-orange-600 hover:no-underline active:bg-orange-200 rounded-md text-white'
 
 function Sidebar() {
   const [open, setOpen] = useState(false);
   const {pathname} = useLocation()
-  const navigate= useNavigate();
-  const { isLogin , setisLogin}=useStateContext();
+  const navigate = useNavigate();
+  
   function logout(){
     localStorage.clear();
-    setisLogin(false);
     navigate('/Login');
   }
   
@@ -28,7 +26,7 @@ function Sidebar() {
         </div>
         <div className={`flex-1 py-8 flex flex-col gap-0.5 duration-300 `}>
           {DASHBOARD_SIDEBAR_LINKS.map((item) =>(
-            <Link to={item.path} className={classNames (pathname === item.path ? 'bg-orange-600 text-white' : '' , linkClasses)}>
+            <Link key={item.label} to={item.path} className={classNames (pathname === item.path ? 'bg-orange-600 text-white' : '' , linkClasses)}>
       <span className={`${open?"text-xl":"text-2xl"}`}>{item.icon}</span>
       { open?item.label:""}
     </Link>
