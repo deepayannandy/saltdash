@@ -27,16 +27,16 @@ function AddClients() {
   const [companyTradeName, setCompanyTradeName] = React.useState([]);
   const [billingAddress, setBillingAddress] = React.useState([]);
   const [shippingAddress, setShippingAddress] = React.useState([]);
+  const [selectedBranch, setSelectedBranch] = React.useState('');
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  const token = localStorage.getItem("userinfo");
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
       navigate("/Login");
     }
-    const token = localStorage.getItem("userinfo");
-    setUserId(token);
-  }, []);
+  });
 
   useEffect(() => {
     getBranchList();
@@ -46,7 +46,7 @@ function AddClients() {
       axios
         .get(`${baseUrl}/api/branches/`, {
           headers: {
-            "auth-token": userId,
+            "auth-token": token,
           },
         })
         .then((response) => {
@@ -63,7 +63,7 @@ function AddClients() {
       axios
         .get(`${baseUrl}/api/clients/` + pathParams.get("id").toString(), {
           headers: {
-            "auth-token": userId,
+            "auth-token": token,
           },
         })
         .then((response) => {
@@ -83,6 +83,7 @@ function AddClients() {
           setGender(response.data.gender);
           setShippingAddress(response.data.shippingAddress);
           setBillingAddress(response.data.billingAddress);
+          setSelectedBranch(response.data.parentBranchId);
         })
         .catch((error) => {
           swal("Oho! \n" + error, {
@@ -224,13 +225,12 @@ function AddClients() {
     e.preventDefault();
     const data = new FormData(e.target);
     const receivedData = Object.fromEntries(data.entries());
-    receivedData.userId = userId;
     if (pathParams.get("id") === "new") {
       axios
         .post(`${baseUrl}/api/clients/`, receivedData, {
           headers: {
             "Content-type": "application/json; charset=UTF-8",
-            "auth-token": userId,
+            "auth-token": token,
           },
         })
         .then(() => {
@@ -257,7 +257,7 @@ function AddClients() {
         .patch(`${baseUrl}/api/clients/` + pathParams.get("id"), receivedData, {
           headers: {
             "Content-type": "application/json; charset=UTF-8",
-            "auth-token": userId,
+            "auth-token": token,
           },
         })
         .then(() => {
@@ -375,7 +375,7 @@ function AddClients() {
             </div>
           ) : (
             <Input
-              name="clientType"
+              name="type"
               type="text"
               placeholder="Client Type"
               value={clientType}
@@ -424,9 +424,13 @@ function AddClients() {
         </div>
         <div className=" grid justify-items-stretch grid-cols-2 gap-4">
           <InputSelect
-            name="ParentBranchId"
+            name="parentBranchId"
             placeholder="Branch"
+            value={selectedBranch}
             options={branches}
+            onchange={(event) => {
+              setSelectedBranch(event.target.value);
+            }}
           ></InputSelect>
         </div>
         <button

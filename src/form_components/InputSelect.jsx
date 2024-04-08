@@ -1,6 +1,7 @@
 import React from "react";
 
 const InputSelect = (props) => {
+  console.log({ props });
   return (
     <div>
       <label
