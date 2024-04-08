@@ -20,7 +20,7 @@ function AddEmployees() {
   const [userType, setUserType] = React.useState('');
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const token = localStorage.getItem("userinfo");
+  const token = localStorage.getItem("userinfo");
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
