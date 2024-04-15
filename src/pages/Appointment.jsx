@@ -44,7 +44,7 @@ function Appointment() {
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
-  const currentView = localStorage.getItem("currentView");
+  const currentView = sessionStorage.getItem("currentView");
 
   const navigateToAddAppointment = (args) => {
     if (args.startTime >= new Date()) {
@@ -123,7 +123,7 @@ function Appointment() {
   };
 
    const onNavigation = (args) => { 
-     localStorage.setItem("currentView", args.currentView);
+     sessionStorage.setItem("currentView", args.currentView);
   } 
 
   useEffect(() => {
