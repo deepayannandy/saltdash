@@ -327,7 +327,7 @@ function AddClients() {
           <Input key={inputs[5].id} {...inputs[5]}></Input>
           {pathParams.get("id") === "new" ? (
             <InputSelect
-              name="Gender"
+              name="gender"
               placeholder="Gender"
               options={["Male", "Female", "Others"]}
             ></InputSelect>
