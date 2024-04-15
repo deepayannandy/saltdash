@@ -44,6 +44,7 @@ function Appointment() {
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
+  const currentView = sessionStorage.getItem("currentView");
 
   const navigateToAddAppointment = (args) => {
     if (args.startTime >= new Date()) {
@@ -55,8 +56,24 @@ function Appointment() {
         }).toString(),
       });
     } else {
-      swal("Sorry! Cannot create appointment for a past date", {
-        icon: "error",
+      swal({
+        title: "Are you sure?",
+        text: "You want to add appointment for past date",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+        closeOnClickOutside: true,
+        closeOnEsc: true,
+      }).then((submit) => {
+        if (submit) {
+          navigate({
+            pathname: "/addappointment",
+            search: createSearchParams({
+              id: "new",
+              startTime: args.startTime,
+            }).toString(),
+          });
+        }
       });
     }
   };
@@ -81,13 +98,33 @@ function Appointment() {
             }).toString(),
           });
         }
-      })
+      });
     } else {
-      swal("Sorry! Cannot reschedule a past appointment", {
-        icon: "error",
+      swal({
+        title: "Are you sure?",
+        text: "You want to edit this appointment of past date",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+        closeOnClickOutside: true,
+        closeOnEsc: true,
+      }).then((submit) => {
+        if (submit) {
+          navigate({
+            pathname: "/addappointment",
+            search: createSearchParams({
+              clientId: args.event.clientId,
+              id: args.event.sid,
+            }).toString(),
+          });
+        }
       });
     }
   };
+
+   const onNavigation = (args) => { 
+     sessionStorage.setItem("currentView", args.currentView);
+  } 
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
@@ -228,7 +265,7 @@ function Appointment() {
           position={"fixed"}
           overflow={"scroll"}
           height={"570px"}
-          currentView="Day"
+          currentView={currentView}
           timezone="Asia/Calcutta"
           views={["Day", "Week", "Month"]}
           eventSettings={{
@@ -241,6 +278,7 @@ function Appointment() {
           selectedDate={new Date()}
           cellClick={navigateToAddAppointment.bind(this)}
           eventClick={handleOnEventClick.bind(this)}
+          navigating={(args) => onNavigation(args)}
         >
           <Inject services={[Day, Week, Month]} />
         </ScheduleComponent>
