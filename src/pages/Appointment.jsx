@@ -55,7 +55,7 @@ function Appointment() {
           startTime: args.startTime,
         }).toString(),
       });
-    } else {
+    } else if(args.startTime){
       swal({
         title: "Are you sure?",
         text: "You want to add appointment for past date",
@@ -74,6 +74,13 @@ function Appointment() {
             }).toString(),
           });
         }
+      });
+    } else {
+      navigate({
+        pathname: "/addappointment",
+        search: createSearchParams({
+          id: "new",
+        }).toString(),
       });
     }
   };
