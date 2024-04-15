@@ -83,10 +83,10 @@ function Employees() {
       swal({
         title: "Are you sure?",
         text:
-          "You want to deactivate " +
-          args.rowData.FirstName +
+          `You want to ${args.rowData.userStatus ? 'deactivate' : 'activate'} `+
+          args.rowData.firstName +
           " " +
-          args.rowData.LastName,
+          args.rowData.lastName,
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -108,7 +108,7 @@ function Employees() {
             .then(() => {
               swal(
                 "Yes! user data for " +
-                  args.rowData.FirstName +
+                  args.rowData.firstName +
                   " has been successfully updated!",
                 {
                   icon: "success",
@@ -179,11 +179,11 @@ function Employees() {
     <button
       name="buttonstatus"
       style={{
-        background: props.UserStatus === true ? "#008000" : "#FFA500",
+        background: props.userStatus === true ? "#008000" : "#FFA500",
       }}
       className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
     >
-      {props.UserStatus === true ? "Active" : "on Hold"}
+      {props.userStatus === true ? "Active" : "on Hold"}
     </button>
   );
 
