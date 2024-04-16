@@ -40,7 +40,6 @@ function AddServices() {
       })
       .then((response) => {
         let branchList = [];
-        console.log(response.data);
         for (const client in response.data) {
           branchList.push(response.data[client].BranchName);
         }
@@ -164,7 +163,6 @@ function AddServices() {
     e.preventDefault();
     const data = new FormData(e.target);
     let receivedData = Object.fromEntries(data.entries());
-    console.log({ receivedData });
     receivedData.userId = userId;
     if (pathParams.get("id") === "new") {
       axios

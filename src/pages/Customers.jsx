@@ -83,7 +83,6 @@ function Customers() {
   const toolbarClick = (args) => {
     if (grid) {
       if (args.item.id.includes("pdfexport")) {
-        console.log("pdfexport");
         const exportProperties = {
           pageOrientation: "Landscape",
           pageSize: "A4",
@@ -92,7 +91,6 @@ function Customers() {
         grid.pdfExport(exportProperties);
       }
       if (args.item.id.includes("excelexport")) {
-        console.log("excelexport");
         const exportProperties = {
           pageOrientation: "Landscape",
           pageSize: "A4",
