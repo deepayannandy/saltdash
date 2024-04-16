@@ -9,7 +9,6 @@ function Dashboard() {
       navigate("/Login");
     }
     let token = localStorage.getItem("userinfo");
-    console.log(token);
   });
 
   return (

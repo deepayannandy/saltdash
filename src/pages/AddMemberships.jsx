@@ -152,7 +152,6 @@ function AddMemberships() {
   };
 
   const addEquipments = (e) => {
-    console.dir({ srs }, { depth: 10 });
     if (selectedServiceName.length > 1 && selectedServiceName !== "Select") {
       const serviceWithCount = srs.get(selectedServiceName);
       serviceWithCount.count = count;

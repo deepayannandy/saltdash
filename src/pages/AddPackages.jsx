@@ -73,7 +73,6 @@ function AddPackages() {
           }
         )
         .then((response) => {
-          console.log(response.data);
           setPackageName(response.data.PackageName);
           setServiceCategory(response.data.ServiceCategory);
           setServiceCost(response.data.ServiceCost);

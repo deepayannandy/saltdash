@@ -42,7 +42,6 @@ function Services() {
       });
       setServiceData(response.data);
     } catch (error) {
-      console.log({ error });
       swal(error, {
         icon: "error",
       });
