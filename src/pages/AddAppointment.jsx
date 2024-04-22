@@ -16,31 +16,28 @@ import _ from "lodash";
 function AddAppointment() {
   const navigate = useNavigate();
   const [errorMessages, setErrorMessages] = React.useState([]);
-  const [userId, setUserId] = React.useState([]);
-  const [scheduleDate, setScheduleDate] = React.useState([]);
-  const [serviceCategory, setServiceCategory] = React.useState([]);
   const [personCount, setPersonCount] = React.useState(1);
-  const [duration, setDuration] = React.useState([]);
   const [clientList, setClientList] = React.useState([]);
   const [membershipList, setMembershipList] = React.useState([]);
   const [servicesList, setServicesList] = React.useState([]);
   const [selectedClient, setSelectedClient] = React.useState("");
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
-  const [selectedServices, setSelectedServices] = React.useState("Select");
   const [clientData, setClientData] = React.useState([]);
   const [servicesData, setServicesData] = React.useState([]);
   const [isClientSelected, setIsClientSelected] = React.useState(false);
   const [isMembership, setIsMembership] = React.useState(false);
   const [isReschedule, setIsReschedule] = React.useState(false);
   const [pathParams] = useSearchParams();
-  const [webServices, setWebServices] = React.useState([]);
-  const [time, setTime] = React.useState([]);
-  const [existingSchedule, setExistingSchedule] = React.useState(null);
   const [branches, setBranches] = React.useState([]);
-  const [scheduleData, setScheduleData] = useState([]);
-  const [clientId, setClientId] = useState("");
   const [location, setLocation] = useState("");
-  const [scheduledAppointments, setScheduledAppointments] = useState([]);
+  const [scheduledAppointments, setScheduledAppointments] = useState([
+    {
+      service: { label: "Select", value: "" },
+      duration: "",
+      scheduleDate: "",
+      time: "",
+    },
+  ]);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -71,10 +68,19 @@ function AddAppointment() {
     getBranchList();
 
     if (pathParams.get("startTime")) {
-      setScheduleDate(
-        format(new Date(pathParams.get("startTime")), "yyyy-MM-dd")
-      );
-      setTime(format(new Date(pathParams.get("startTime")), "HH:mm"));
+      const newAppointments = [];
+      for (const appointment of scheduledAppointments) {
+        appointment.scheduleDate = format(
+          new Date(pathParams.get("startTime")),
+          "yyyy-MM-dd"
+        );
+        appointment.time = format(
+          new Date(pathParams.get("startTime")),
+          "HH:mm"
+        );
+        newAppointments.push(appointment);
+      }
+      setScheduledAppointments(newAppointments);
     }
 
     getClientList();
@@ -122,19 +128,20 @@ function AddAppointment() {
         );
 
         if (appointmentResponse.data) {
-          setIsReschedule(true);
-          setScheduleDate(
-            format(
+          const appointmentData = {
+            scheduleDate: format(
               new Date(appointmentResponse.data.startDateTime),
               "yyyy-MM-dd"
-            )
-          );
-          setTime(
-            format(new Date(appointmentResponse.data.startDateTime), "HH:mm")
-          );
-          setClientId(appointmentResponse.data.clientId);
+            ),
+            time: format(
+              new Date(appointmentResponse.data.startDateTime),
+              "HH:mm"
+            ),
+            duration: appointmentResponse.data.service.duration,
+          };
+
+          setIsReschedule(true);
           setPersonCount(appointmentResponse.data.personCount);
-          setDuration(appointmentResponse.data.service.duration);
           setLocation(appointmentResponse.data.branch);
 
           if (pathParams.get("clientId")) {
@@ -158,12 +165,14 @@ function AddAppointment() {
               });
             }
 
-            setSelectedServices({
+            appointmentData.service = {
               label: appointmentResponse.data.service.name,
               value: appointmentResponse.data.service._id,
-            });
+            };
+
+            setScheduledAppointments([appointmentData]);
             setLocation(appointmentResponse.data.service);
-            setDuration(appointmentResponse.data.service.duration);
+            //setDuration(appointmentResponse.data.service.duration);
             if (appointmentResponse.data.services) {
               const servicesData = [];
               for (const service of appointmentResponse.data.services) {
@@ -187,43 +196,12 @@ function AddAppointment() {
   const inputs = [
     {
       id: 1,
-      name: "date",
-      type: "date",
-      placeholder: "Date",
-      value: scheduleDate,
-      onChange: (event) => {
-        setScheduleDate(event.target.value);
-      },
-    },
-    {
-      id: 2,
       name: "personCount",
       type: "number",
       placeholder: "Person Count",
       value: personCount,
       onChange: (event) => {
         setPersonCount(event.target.value);
-      },
-    },
-
-    {
-      id: 3,
-      name: "duration",
-      type: "number",
-      placeholder: "duration",
-      value: duration,
-      onChange: (event) => {
-        setDuration(event.target.value);
-      },
-    },
-    {
-      id: 4,
-      name: "time",
-      type: "time",
-      placeholder: "Time",
-      value: time,
-      onChange: (event) => {
-        setTime(event.target.value);
       },
     },
   ];
@@ -235,35 +213,21 @@ function AddAppointment() {
     const receivedData = Object.fromEntries(data.entries());
 
     const appointmentData = [];
-    if (scheduledAppointments.length) {
-      for (const appointment of scheduledAppointments) {
+    for (const appointment of scheduledAppointments) {
+      if (appointment.duration) {
         const data = {
           membershipId: receivedData.selectedMembership,
           personCount: receivedData.personCount,
           branch: receivedData.location,
-          serviceId: appointment.serviceId,
+          serviceId: appointment.service.value,
           startDateTime: appointment.scheduleDate + " " + appointment.time,
           duration: appointment.duration,
         };
         appointmentData.push(data);
       }
-    } else {
-      const data = {
-        membershipId: receivedData.selectedMembership,
-        personCount: receivedData.personCount,
-        branch: receivedData.location,
-        serviceId: receivedData.selectedService,
-        startDateTime: receivedData.date + " " + receivedData.time,
-        duration: receivedData.duration,
-      };
-      appointmentData.push(data);
     }
 
-    const client = clientList.find(
-      (list) => list.value === receivedData.selectedClient
-    );
-
-    const clientName = client.label;
+    const clientName = selectedClient.label;
 
     swal({
       title: "Are you sure?",
@@ -282,7 +246,7 @@ function AddAppointment() {
         if (pathParams.get("id") === "new") {
           axios
             .post(
-              `${baseUrl}/api/appointments/${receivedData.selectedClient}`,
+              `${baseUrl}/api/appointments/${selectedClient.value}`,
               {
                 appointmentData,
               },
@@ -319,7 +283,10 @@ function AddAppointment() {
           axios
             .patch(
               `${baseUrl}/api/appointments/` + pathParams.get("id"),
-              { ...appointmentData[0], clientId: receivedData.selectedClient },
+              {
+                ...appointmentData[0],
+                clientId: selectedClient.value,
+              },
               {
                 headers: {
                   "Content-type": "application/json; charset=UTF-8",
@@ -332,7 +299,7 @@ function AddAppointment() {
                 "Yes! The appointment for " +
                   clientName +
                   " has been successfully rescheduled on " +
-                  receivedData.startDateTime,
+                  appointmentData[0].startDateTime,
                 {
                   icon: "success",
                 }
@@ -354,58 +321,21 @@ function AddAppointment() {
       }
     });
   };
-  // function handleInputChange(event) {
-  //   if (event.length) {
-  //     axios
-  //       .get(`${baseUrl}/api/clients/search/` + event, {
-  //         headers: {
-  //           "auth-token": token,
-  //         },
-  //       })
-  //       .then((response) => {
-  //         let clientList = [];
-  //         for (let client in response.data) {
-  //           clientList.push({
-  //             label:
-  //               response.data[client].firstName +
-  //               " " +
-  //               response.data[client].lastName +
-  //               " (" +
-  //               response.data[client].mobileNumber +
-  //               ")",
-  //             value: response.data[client]._id,
-  //           });
-  //         }
-  //         setClientList(clientList);
-  //       });
-  //   } else {
-  //     axios
-  //       .get(`${baseUrl}/api/clients/`, {
-  //         headers: {
-  //           "auth-token": token,
-  //         },
-  //       })
-  //       .then((response) => {
-  //         let clientList = [];
-  //         for (let client in response.data) {
-  //           clientList.push({
-  //             label:
-  //               response.data[client].firstName +
-  //               " " +
-  //               response.data[client].lastName +
-  //               " (" +
-  //               response.data[client].mobileNumber +
-  //               ")",
-  //             value: response.data[client]._id,
-  //           });
-  //         }
-  //         setClientList(clientList);
-  //       });
-  //   }
-  // }
+
   async function handelClientSelect(event) {
     setSelectedClient({ label: event.label, value: event.value });
     setIsClientSelected(true);
+    setScheduledAppointments([
+      {
+        service: { label: "Select", value: "" },
+        duration: "",
+        scheduleDate: "",
+        time: "",
+      },
+    ]);
+
+    setLocation('');
+    setPersonCount(1);
 
     try {
       const response = await axios.get(
@@ -479,8 +409,10 @@ function AddAppointment() {
     }
   }
 
-  function handelServiceSelect(event) {
-    setSelectedServices(event);
+  function handelServiceSelect(event, appointmentIndex) {
+    const newScheduleAppointments = [...scheduledAppointments];
+    newScheduleAppointments[appointmentIndex]["service"] = event;
+
     let service;
     if (isMembership) {
       if (clientData.clientMemberships) {
@@ -500,38 +432,32 @@ function AddAppointment() {
     }
 
     if (service) {
+      newScheduleAppointments[appointmentIndex]["duration"] = service.duration;
       setLocation(service.branch);
-      setDuration(service.duration);
     }
+    setScheduledAppointments(newScheduleAppointments);
   }
 
-  const addMultipleAppointments = (event) => {
-    if (selectedServices && scheduleDate && duration && time) {
-      const isAppointmentAlreadyAdded = scheduledAppointments.some(
-        (appointment) => appointment.serviceName === selectedServices.label
-      );
-      if (isAppointmentAlreadyAdded) {
-        swal("Oho! \n" + `Appointment already added for this service`, {
-          icon: "error",
-        });
-      } else {
-        const appointment = {
-          id: _.uniqueId(selectedServices.value),
-          serviceName: selectedServices.label,
-          serviceId: selectedServices.value,
-          duration,
-          scheduleDate,
-          time,
-        };
-        setScheduledAppointments([...scheduledAppointments, appointment]);
-      }
-    }
+  const handleInputChange = (event, fieldName, appointmentIndex) => {
+    const newScheduleAppointments = [...scheduledAppointments];
+    newScheduleAppointments[appointmentIndex][fieldName] = event.target.value;
+    setScheduledAppointments(newScheduleAppointments);
   };
 
-  const deleteAppointment = (id) => {
-    const appointments = scheduledAppointments.filter(
-      (appointment) => appointment.id !== id
-    );
+  const addMultipleAppointments = () => {
+    const newScheduleAppointments = [...scheduledAppointments];
+    newScheduleAppointments.push({
+      service: { label: "Select", value: "" },
+      duration: "",
+      scheduleDate: "",
+      time: "",
+    });
+    setScheduledAppointments(newScheduleAppointments);
+  };
+
+  const removeAppointment = (appointmentIndex) => {
+    const appointments = [...scheduledAppointments];
+    appointments.splice(appointmentIndex, 1);
     setScheduledAppointments(appointments);
   };
 
@@ -574,7 +500,7 @@ function AddAppointment() {
               name="selectedClient"
               placeholder="Client"
               onchange={handelClientSelect}
-              //isDisabled={isReschedule}
+              isDisabled={isReschedule}
             />
           </div>
           {isClientSelected ? (
@@ -593,106 +519,72 @@ function AddAppointment() {
             <div />
           )}
         </div>
-        <div className=" grid justify-items-stretch grid-cols-5 gap-4">
-          <InputSearch
-            name="selectedService"
-            placeholder="Service"
-            options={servicesList}
-            value={selectedServices}
-            onchange={handelServiceSelect}
-          ></InputSearch>
-          <Input key={inputs[2].id} {...inputs[2]}></Input>
-          <Input key={inputs[0].id} {...inputs[0]}></Input>
-          <Input key={inputs[3].id} {...inputs[3]}></Input>
-          {pathParams.get("id") === "new" ? (
-            <button
-              className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
-              type="button"
-              onClick={addMultipleAppointments}
-            >
-              Add
-            </button>
-          ) : (
-            <div />
-          )}
-        </div>
-        {pathParams.get("id") === "new" ? (
-          <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">
-              Added Appointments
-            </label>
-            <div class="p-1">
-              <table class="w-5/6  border">
-                <thead>
-                  <tr>
-                    <th class="font-bold py-2 px-4 border-b border-l border-r text-left">
-                      Service Name
-                    </th>
-                    <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
-                      Duration
-                    </th>
-                    <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
-                      Date
-                    </th>
-                    <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
-                      Time
-                    </th>
-                    <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scheduledAppointments.map((appointment) => (
-                    <tr>
-                      <td class="border border-slate-700 ...">
-                        {appointment.serviceName}
-                      </td>
-                      <td class="border border-slate-700 ...">
-                        {appointment.duration}
-                      </td>
-                      <td class="border border-slate-700 ...">
-                        {appointment.scheduleDate}
-                      </td>
-                      <td class="border border-slate-700 ...">
-                        {appointment.time}
-                      </td>
-                      <td class="border border-slate-700 ...">
-                        <button
-                          style={{ background: "#B22222" }}
-                          type="button"
-                          className="text-white py-1 px-2 capitalize rounded-2xl text-md"
-                          onClick={() => deleteAppointment(appointment.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {/* <tr>
-            <td class=" py-2 px-4 border-b border-l border-r  text-left">The Sliding Mr. Bones (Next Stop, Pottersville)</td>
-            <td class=" py-2 px-4 border-b border-l border-r  text-left">Malcolm Lockyer</td>
-            <td class=" py-2 px-4 border-b border-l border-r  text-left">1961</td>
-          </tr> */}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div />
-        )}
 
-        <div className=" grid justify-items-stretch grid-cols-4 gap-1">
-          {existingSchedule !== null ? (
-            existingSchedule.map((schedule) => (
-              <MembershipCard title={schedule.title} />
-            ))
-          ) : (
-            <div />
-          )}
-        </div>
+        {scheduledAppointments.map((appointment, appointmentIndex) => (
+          <div className="grid justify-items-stretch grid-cols-5 gap-4">
+            <InputSearch
+              name="selectedService"
+              placeholder="Service"
+              options={servicesList}
+              value={appointment.service}
+              onchange={(event) => handelServiceSelect(event, appointmentIndex)}
+            ></InputSearch>
+            <Input
+              name="duration"
+              type="number"
+              placeholder="Duration"
+              value={appointment.duration}
+              onChange={(event) =>
+                handleInputChange(event, "duration", appointmentIndex)
+              }
+            ></Input>
+            <Input
+              name="date"
+              type="date"
+              placeholder="Date"
+              value={appointment.scheduleDate}
+              onChange={(event) =>
+                handleInputChange(event, "scheduleDate", appointmentIndex)
+              }
+            ></Input>
+            <Input
+              name="time"
+              type="time"
+              placeholder="Time"
+              value={appointment.time}
+              onChange={(event) =>
+                handleInputChange(event, "time", appointmentIndex)
+              }
+            ></Input>
+
+            {pathParams.get("id") === "new" ? (
+              appointmentIndex === scheduledAppointments.length - 1 ? (
+                <button
+                  style={{ marginTop: "28px" }}
+                  className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
+                  type="button"
+                  onClick={() => addMultipleAppointments()}
+                >
+                  Add +
+                </button>
+              ) : (
+                <button
+                  style={{ marginTop: "28px", backgroundColor: "red" }}
+                  className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
+                  type="button"
+                  onClick={() => removeAppointment(appointmentIndex)}
+                >
+                  Remove -
+                </button>
+              )
+            ) : (
+              <div />
+            )}
+          </div>
+        ))}
+
         <div className=" grid justify-items-stretch grid-cols-3 gap-4">
-          <Input key={inputs[1].id} {...inputs[1]}></Input>
+          <Input key={inputs[0].id} {...inputs[0]}></Input>
           <InputSelect
             name="location"
             placeholder="Branch"
