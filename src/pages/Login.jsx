@@ -5,7 +5,7 @@ import LogoImg from "../assets/logo.png";
 import { Link } from "react-router-dom";
 import ForgotPassword from "./ForgotPassword";
 import axios from "axios";
-import { useStateContext } from "../contexts/ContextProvider";
+import swal from "sweetalert";
 
 const Login = () => {
   const [errormessage, setErrormessage] = useState("Sign In");
@@ -34,10 +34,11 @@ const Login = () => {
       })
       .catch((error) => {
         if (error.response) {
-          console.log(error.response.data);
-          if (error.response.data["message"] != undefined) {
-            console.log(error.response.data);
-            setErrormessage("Login Failed");
+          if (error.response.data["message"] !== undefined) {
+            setErrormessage(error.response.data["message"]);
+            swal("Oho! \n" + error.response.data["message"], {
+              icon: "error",
+            });
           }
         }
       });
