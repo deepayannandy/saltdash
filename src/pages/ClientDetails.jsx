@@ -36,6 +36,8 @@ function ClientDetails() {
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [mobileNumber, setMobileNumber] = React.useState("");
+  const [alternate_email, set_alternate_Email] = React.useState([]);
+  const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState([]);
   const [birthDate, setBirthDate] = React.useState("");
   const [anniversary, setAnniversary] = React.useState("");
   const [occupation, setOccupation] = React.useState("");
@@ -156,6 +158,8 @@ function ClientDetails() {
           setLastName(response.data.lastName);
           setEmail(response.data.email);
           setMobileNumber(response.data.mobileNumber);
+          setEmail(response.data.email);
+          setMobileNumber(response.data.mobileNumber);
           setBirthDate(response.data.birthDate);
           setAnniversary(response.data.anniversary);
           setOccupation(response.data.occupation);
@@ -168,6 +172,8 @@ function ClientDetails() {
           setGender(response.data.gender);
           setShippingAddress(response.data.shippingAddress);
           setBillingAddress(response.data.billingAddress);
+          set_alternate_MobileNumber(response.data.alternate_mobileNumber)
+          set_alternate_Email(response.data.alternate_email);
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -337,11 +343,14 @@ function ClientDetails() {
             placeholder="Client Name:"
             value={firstName + " " + lastName}
           />
-          <div class="col-span-2">
+          <div class="col-span-1">
             {" "}
-            <Shows span={2} placeholder="email:" value={email} />
+            <Shows span={1} placeholder="Email:" value={email} />
+           
           </div>
+          <Shows placeholder="Alternate Email:" value={alternate_email} />
           <Shows placeholder="Mobile Number:" value={mobileNumber} />
+          <Shows placeholder="Alternate Mobile Number:" value={alternate_mobileNumber} />
           <Shows placeholder="Date of Birth:" value={birthDate} />
           <Shows placeholder="Anniversary:" value={anniversary} />
           <Shows placeholder="Occupation:" value={occupation} />

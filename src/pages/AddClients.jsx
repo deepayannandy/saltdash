@@ -15,6 +15,8 @@ function AddClients() {
   const [firstName, setFirstName] = React.useState([]);
   const [lastName, setLastName] = React.useState([]);
   const [email, setEmail] = React.useState([]);
+  const [alternate_email, set_alternate_Email] = React.useState([]);
+  const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState([]);
   const [mobileNumber, setMobileNumber] = React.useState([]);
   const [birthDate, setBirthDate] = React.useState([]);
   const [anniversary, setAnniversary] = React.useState([]);
@@ -84,6 +86,8 @@ function AddClients() {
           setShippingAddress(response.data.shippingAddress);
           setBillingAddress(response.data.billingAddress);
           setSelectedBranch(response.data.parentBranchId);
+          set_alternate_MobileNumber(response.data.alternate_mobileNumber)
+          set_alternate_Email(response.data.alternate_email);
         })
         .catch((error) => {
           swal("Oho! \n" + error, {
@@ -218,6 +222,26 @@ function AddClients() {
         setCompanyTradeName(event.target.value);
       },
     },
+    {
+      id: 13,
+      name: "alternate_email",
+      type: "text",
+      placeholder: "Alternate Email",
+      value: alternate_email,
+      onChange: (event) => {
+        set_alternate_Email(event.target.value);
+      },
+    },
+    {
+      id: 14,
+      name: "alternate_mobileNumber",
+      type: "text",
+      placeholder: "Alternate Mobile Number",
+      value: alternate_mobileNumber,
+      onChange: (event) => {
+        set_alternate_MobileNumber(event.target.value);
+      },
+    },
   ];
 
   const handleSubmit = async (e) => {
@@ -253,6 +277,7 @@ function AddClients() {
           }
         });
     } else {
+      console.log(receivedData)
       axios
         .patch(`${baseUrl}/api/clients/` + pathParams.get("id"), receivedData, {
           headers: {
@@ -320,10 +345,15 @@ function AddClients() {
           <Input key={inputs[1].id} {...inputs[1]}></Input>
         </div>
 
-        <div className=" grid justify-items-stretch grid-cols-5 gap-4">
+        <div className=" grid justify-items-stretch grid-cols-4 gap-4">
           <Input key={inputs[2].id} {...inputs[2]}></Input>
+          <Input key={inputs[13].id} {...inputs[13]}></Input>
           <Input key={inputs[3].id} {...inputs[3]}></Input>
-          <Input key={inputs[4].id} {...inputs[4]}></Input>
+          <Input key={inputs[12].id} {...inputs[12]}></Input>
+        </div>
+
+        <div className=" grid justify-items-stretch grid-cols-3 gap-4">
+        <Input key={inputs[4].id} {...inputs[4]}></Input>
           <Input key={inputs[5].id} {...inputs[5]}></Input>
           {pathParams.get("id") === "new" ? (
             <InputSelect
