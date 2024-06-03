@@ -187,7 +187,7 @@ function AddPackages() {
           .then((data) => {
             swal(
               "Yes! " +
-                receivedData.packageName +
+                receivedData.PackageName +
                 " has been successfully Added!",
               {
                 icon: "success",
@@ -221,7 +221,7 @@ function AddPackages() {
           .then(() => {
             swal(
               "Yes! " +
-                receivedData.packageName +
+                receivedData.PackageName +
                 " has been successfully Updated!",
               {
                 icon: "success",
