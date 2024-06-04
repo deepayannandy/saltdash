@@ -11,7 +11,7 @@ import {
   Resize,
 } from "@syncfusion/ej2-react-grids";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, createSearchParams } from "react-router-dom";
 import swal from "sweetalert";
 
 function Membership() {
@@ -50,6 +50,70 @@ function Membership() {
     getMembershipData();
   }, []);
 
+  const showQR = () => (
+    <div className="flex">
+      <button
+        name="buttonedit"
+        style={{ background: "#008000" }}
+        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
+      >
+        Edit
+      </button>
+      <div className="w-5" />
+      <button
+        name="buttondelete"
+        style={{ background: "#B22222" }}
+        className="edititem text-white py-1 px-2 capitalize rounded-2xl text-md"
+      >
+        Delete
+      </button>
+    </div>
+  );
+
+  const recordClick = (args) => {
+    if (args.target.name === "buttonedit") {
+      navigate({
+        pathname: "/addmemberships",
+        search: createSearchParams({ id: args.rowData._id }).toString(),
+      });
+    }
+    if (args.target.name === "buttondelete") {
+      swal({
+        title: "Are you sure?",
+        text: "You want to delete " + args.rowData.name,
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+        closeOnClickOutside: true,
+        closeOnEsc: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          axios
+            .delete(
+              `${baseUrl}/api/memberships/` +
+                args.rowData._id,
+              {
+                headers: { "auth-token": token },
+              }
+            )
+            .then(() => {
+              swal("Poof! " + args.rowData.name + " has been deleted!", {
+                icon: "success",
+              });
+              getMembershipData();
+            })
+            .catch((error) => {
+              if (error.response.data["message"] !== undefined) {
+                swal("Oho! \n" + error.response.data["message"], {
+                  icon: "error",
+                });
+              }
+            });
+        }
+      });
+    }
+  };
+
   return (
     <div className=" flex-row gap-1">
       <div className="flex-direction: column">
@@ -72,6 +136,7 @@ function Membership() {
           pageSettings={{ pageSize: 10 }}
           editSettings={editing}
           toolbar={toolbarOptions}
+          recordClick={recordClick}
           //  actionComplete={actionComplete}
           //  toolbarClick={toolbarClick}
           // height= {500}
@@ -147,6 +212,15 @@ function Membership() {
               minWidth="100"
               width="150"
               maxWidth="300"
+            />
+            <ColumnDirective
+              field="_id"
+              headerText="Action"
+              minWidth="100"
+              width="80"
+              maxWidth="300"
+              isPrimaryKey={true}
+              template={showQR}
             />
           </ColumnsDirective>
           <Inject services={[Page, Edit, Toolbar, InfiniteScroll, Resize]} />
