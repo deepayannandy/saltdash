@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input, Header, InputSelect } from "../form_components";
 import { BsArrowLeftShort } from "react-icons/bs";
 
@@ -16,7 +16,7 @@ function AddMemberships() {
   const [count, setCount] = useState(0);
   const [isUnlimited, setIsUnlimited] = useState(false);
   const [selectedServiceName, setSelectedServiceName] = useState('');
-  //const [searchParams] = useSearchParams();
+  const [pathParams] = useSearchParams();
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   let service = new Map();
@@ -180,7 +180,13 @@ function AddMemberships() {
           className="text-gray-700 text-3xl mt-5 absolute left-23.1 top-20 cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <Header title="Create a new Membership" />
+        <Header
+          title={
+            pathParams.get("id") === "new"
+              ? "Create a new Membership"
+              : "Edit membership"
+          }
+        />
         <div className=" grid justify-items-stretch grid-cols-2 gap-4">
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <InputSelect
