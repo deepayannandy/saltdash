@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input, Header, InputSelect } from "../form_components";
 import { BsArrowLeftShort } from "react-icons/bs";
+import swal from "sweetalert";
 
 function AddMemberships() {
   const navigate = useNavigate();
@@ -13,10 +14,19 @@ function AddMemberships() {
   const [serviceName, setServiceName] = React.useState([]);
   const [selectedService, setSelectedService] = React.useState([]);
   const [srs, setSrs] = React.useState(new Map());
-  const [count, setCount] = useState(0);
+
   const [isUnlimited, setIsUnlimited] = useState(false);
-  const [selectedServiceName, setSelectedServiceName] = useState('');
+  const [selectedServiceName, setSelectedServiceName] = useState("");
   const [pathParams] = useSearchParams();
+  const [name, setName] = React.useState("");
+  const [cost, setCost] = React.useState("");
+  const [sellingCost, setSellingCost] = React.useState("");
+  const [hsnCode, setHsnCode] = React.useState("");
+  const [taxRate, setTaxRate] = React.useState("");
+  const [count, setCount] = useState(0);
+  const [validity, setValidity] = React.useState("");
+  const [branch, setBranch] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   let service = new Map();
@@ -53,7 +63,6 @@ function AddMemberships() {
     getServiceData();
   }, []);
 
-
   const getBranchList = () => {
     axios
       .get(`${baseUrl}/api/branches/`, {
@@ -70,6 +79,7 @@ function AddMemberships() {
 
   useEffect(() => {
     getBranchList();
+    getMembershipData();
   }, []);
 
   const inputs = [
@@ -77,31 +87,51 @@ function AddMemberships() {
       id: 1,
       name: "name",
       type: "text",
+      value: name,
       placeholder: "Membership Name",
+      onChange: (event) => {
+        setName(event.target.value);
+      },
     },
     {
       id: 2,
       name: "cost",
       type: "number",
+      value: cost,
       placeholder: "Membership Cost",
+      onChange: (event) => {
+        setCost(event.target.value);
+      },
     },
     {
       id: 3,
       name: "sellingCost",
       type: "number",
+      value: sellingCost,
       placeholder: "Selling Cost",
+      onChange: (event) => {
+        setSellingCost(event.target.value);
+      },
     },
     {
       id: 4,
       name: "hsnCode",
       type: "text",
+      value: hsnCode,
       placeholder: "HSN Code",
+      onChange: (event) => {
+        setHsnCode(event.target.value);
+      },
     },
     {
       id: 5,
       name: "taxRate",
       type: "number",
+      value: taxRate,
       placeholder: "Tax",
+      onChange: (event) => {
+        setTaxRate(event.target.value);
+      },
     },
     {
       id: 6,
@@ -115,12 +145,20 @@ function AddMemberships() {
       id: 7,
       name: "isUnlimited",
       type: "checkbox",
+      value: isUnlimited,
+      onChange: (event) => {
+        setIsUnlimited(event.target.value);
+      },
     },
     {
       id: 8,
       name: "validity",
       type: "number",
+      value: validity,
       placeholder: "Validity",
+      onChange: (event) => {
+        setValidity(event.target.value);
+      },
     },
   ];
 
@@ -131,24 +169,84 @@ function AddMemberships() {
     let receivedData = Object.fromEntries(data.entries());
     receivedData.serviceIds = selectedService.map((service) => service._id);
     receivedData.isUnlimited = isUnlimited;
-    axios
-      .post(`${baseUrl}/api/memberships`, receivedData, {
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-          "auth-token": token,
-        },
-      })
-      .then(() => {
-        navigate("/membership");
-      })
-      .catch((error) => {
-        if (error.response) {
-          setErrorMessage(error.response.data);
-          if (error.response.data["message"] !== undefined) {
-            setErrorMessage(error.response.data["message"]);
+
+    if (pathParams.get("id")) {
+      axios
+        .patch(
+          `${baseUrl}/api/memberships/` + pathParams.get("id"),
+          receivedData,
+          {
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              "auth-token": token,
+            },
           }
-        }
-      });
+        )
+        .then(() => {
+          swal(
+            "Yes! " + receivedData.name + " has been successfully Updated!",
+            {
+              icon: "success",
+            }
+          );
+          navigate("/membership");
+        })
+        .catch((error) => {
+          if (error.response) {
+            setErrorMessage(error.response.data);
+            if (error.response.data["message"] !== undefined) {
+              setErrorMessage(error.response.data["message"]);
+            }
+          }
+        });
+    } else {
+      axios
+        .post(`${baseUrl}/api/memberships`, receivedData, {
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "auth-token": token,
+          },
+        })
+        .then(() => {
+          navigate("/membership");
+        })
+        .catch((error) => {
+          if (error.response) {
+            setErrorMessage(error.response.data);
+            if (error.response.data["message"] !== undefined) {
+              setErrorMessage(error.response.data["message"]);
+            }
+          }
+        });
+    }
+  };
+
+  const getMembershipData = () => {
+    if (pathParams.get("id")) {
+      axios
+        .get(`${baseUrl}/api/memberships/` + pathParams.get("id").toString(), {
+          headers: {
+            "auth-token": token,
+          },
+        })
+        .then((response) => {
+          setName(response.data.name);
+          setCost(response.data.cost);
+          setSellingCost(response.data.sellingCost);
+          setTaxRate(response.data.taxRate);
+          setHsnCode(response.data.hsnCode);
+          setIsUnlimited(response.data.isUnlimited);
+          setCount(response.data.count);
+          setValidity(response.data.validity);
+          setBranch(response.data.branch);
+          setDescription(response.data.description);
+        })
+        .catch((error) => {
+          swal("Oho! \n" + error, {
+            icon: "error",
+          });
+        });
+    }
   };
 
   const addEquipments = (e) => {
@@ -182,9 +280,7 @@ function AddMemberships() {
         />
         <Header
           title={
-            pathParams.get("id") === "new"
-              ? "Create a new Membership"
-              : "Edit membership"
+            pathParams.get("id") ? "Edit membership" : "Create a new Membership"
           }
         />
         <div className=" grid justify-items-stretch grid-cols-2 gap-4">
@@ -192,7 +288,11 @@ function AddMemberships() {
           <InputSelect
             name="branch"
             placeholder="Membership Branch"
+            value={branch}
             options={branches}
+            onchange={(event) => {
+              setBranch(event.target.value);
+            }}
           ></InputSelect>
         </div>
         <div className="">
@@ -202,6 +302,10 @@ function AddMemberships() {
           <textarea
             name="description"
             placeholder="Membership Description"
+            value={description}
+            onChange={(event) => {
+              setDescription(event.target.value);
+            }}
             className="shadow appearance-none border border-grey-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
@@ -215,7 +319,7 @@ function AddMemberships() {
           <div class="flex items-center">
             <input
               name="isUnlimited"
-              value={isUnlimited}
+              checked={isUnlimited}
               onChange={() => {
                 setIsUnlimited(!isUnlimited);
               }}
