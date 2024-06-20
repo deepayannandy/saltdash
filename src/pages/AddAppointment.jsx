@@ -325,16 +325,23 @@ function AddAppointment() {
   async function handelClientSelect(event) {
     setSelectedClient({ label: event.label, value: event.value });
     setIsClientSelected(true);
+
     setScheduledAppointments([
       {
         service: { label: "Select", value: "" },
         duration: "",
-        scheduleDate: "",
-        time: "",
+        scheduleDate: pathParams.get("startTime") ? format(
+          new Date(pathParams.get("startTime")),
+          "yyyy-MM-dd"
+        ) : "",
+        time: pathParams.get("startTime") ? format(
+          new Date(pathParams.get("startTime")),
+          "HH:mm"
+        ) : "",
       },
     ]);
 
-    setLocation('');
+    setLocation("");
     setPersonCount(1);
 
     try {
@@ -465,6 +472,56 @@ function AddAppointment() {
     event.preventDefault();
     setLocation(event.target.value);
   }
+
+  const deleteMembership = (e) => {
+    setErrorMessages("");
+    e.preventDefault();
+
+    swal({
+      title: "Are you sure?",
+      text: `You want to delete this appointment`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((submit) => {
+      if (submit) {
+        axios
+          .delete(`${baseUrl}/api/appointments/` + pathParams.get("id"), {
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              "auth-token": token,
+            },
+            data: {
+              clientId: selectedClient.value,
+            },
+          })
+          .then(() => {
+            swal(
+              "Yes! The appointment for " +
+                selectedClient.label +
+                " has been deleted",
+              {
+                icon: "success",
+              }
+            );
+            navigate("/appointment");
+          })
+          .catch((error) => {
+            if (error.response) {
+              setErrorMessages(error.response.data);
+              if (error.response.data["message"] !== undefined) {
+                setErrorMessages(error.response.data["message"]);
+                swal("Oho! \n" + error.response.data["message"], {
+                  icon: "error",
+                });
+              }
+            }
+          });
+      }
+    });
+  };
 
   return (
     <div className="  justify-center">
@@ -604,6 +661,18 @@ function AddAppointment() {
               : "Schedule"
             : "Reschedule"}
         </button>
+
+        {pathParams.get("id") === "new" ? (
+          ""
+        ) : (
+          <button
+            className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
+            style={{ margin: 10 }}
+            onClick={deleteMembership}
+          >
+            Delete
+          </button>
+        )}
       </form>
     </div>
   );
