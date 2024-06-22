@@ -167,7 +167,8 @@ function AddMemberships() {
     e.preventDefault();
     const data = new FormData(e.target);
     let receivedData = Object.fromEntries(data.entries());
-    receivedData.serviceIds = selectedService.map((service) => service._id);
+    const serviceIds = selectedService.map((service) => { return { id: service._id, count: service.count } });
+    receivedData.serviceIds = serviceIds;
     receivedData.isUnlimited = isUnlimited;
 
     if (pathParams.get("id")) {
@@ -260,7 +261,7 @@ function AddMemberships() {
   };
 
     function removeService(service) {
-      const newList = selectedService.filter((li) => li.name !== service);
+      const newList = selectedService.filter((li) => li.name !== service.name || li.count !== service.count);
       setSelectedService(newList);
   }
   
@@ -416,7 +417,7 @@ function AddMemberships() {
                       style={{ background: "#B22222" }}
                       className="button text-white py-1 px-2 capitalize rounded-2xl text-md"
                       onClick={() => {
-                        removeService(sr.name);
+                        removeService(sr);
                       }}
                     >
                       Remove
