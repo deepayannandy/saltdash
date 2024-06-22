@@ -348,8 +348,6 @@ function ClientDetails() {
   };
 
   const addMemberships = () => {
-    console.log({ membershipList });
-    console.log(selectedMembership);
     const data = {
       membershipId: selectedMembership.value,
       paidAmount: paidAmount,
