@@ -167,7 +167,8 @@ function AddMemberships() {
     e.preventDefault();
     const data = new FormData(e.target);
     let receivedData = Object.fromEntries(data.entries());
-    receivedData.serviceIds = selectedService.map((service) => service._id);
+    const serviceIds = selectedService.map((service) => { return { id: service._id, count: service.count } });
+    receivedData.serviceIds = serviceIds;
     receivedData.isUnlimited = isUnlimited;
 
     if (pathParams.get("id")) {
@@ -240,6 +241,7 @@ function AddMemberships() {
           setValidity(response.data.validity);
           setBranch(response.data.branch);
           setDescription(response.data.description);
+          setSelectedService(response.data.services);
         })
         .catch((error) => {
           swal("Oho! \n" + error, {
@@ -258,6 +260,11 @@ function AddMemberships() {
     }
   };
 
+    function removeService(service) {
+      const newList = selectedService.filter((li) => li.name !== service.name || li.count !== service.count);
+      setSelectedService(newList);
+  }
+  
   return (
     // <div className="flex flex-row gap-1">
     <div className="  justify-center">
@@ -392,6 +399,9 @@ function AddMemberships() {
                 <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
                   Count
                 </th>
+                <th className="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -401,6 +411,18 @@ function AddMemberships() {
                   <td class="border border-slate-700 ...">{sr.duration}</td>
                   <td class="border border-slate-700 ...">{sr.sellingCost}</td>
                   <td class="border border-slate-700 ...">{sr.count}</td>
+                  <td className="border border-slate-700 ...">
+                    <button
+                      type="button"
+                      style={{ background: "#B22222" }}
+                      className="button text-white py-1 px-2 capitalize rounded-2xl text-md"
+                      onClick={() => {
+                        removeService(sr);
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </td>
                 </tr>
               ))}
               {/* <tr>
