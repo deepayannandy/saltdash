@@ -2,7 +2,13 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import swal from "sweetalert";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Header, Shows, Input, InputSelect } from "../form_components";
+import {
+  Header,
+  Shows,
+  Input,
+  InputSelect,
+  InputSearch,
+} from "../form_components";
 import Divider from "@mui/material/Divider";
 import { AppBar, Tab, Tabs } from "@material-ui/core";
 import {
@@ -37,7 +43,9 @@ function ClientDetails() {
   const [email, setEmail] = React.useState("");
   const [mobileNumber, setMobileNumber] = React.useState("");
   const [alternate_email, set_alternate_Email] = React.useState([]);
-  const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState([]);
+  const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState(
+    []
+  );
   const [birthDate, setBirthDate] = React.useState("");
   const [anniversary, setAnniversary] = React.useState("");
   const [occupation, setOccupation] = React.useState("");
@@ -56,6 +64,13 @@ function ClientDetails() {
   const [clientNotes, setClientNotes] = React.useState([]);
   const [showNotes, setShowNotes] = React.useState(true);
   const [note, setNote] = React.useState("");
+  const [showMemberships, setShowMemberships] = React.useState(true);
+  const [paidAmount, setPaidAmount] = React.useState("");
+  const [count, setCount] = React.useState("");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
+  const [membershipList, setMembershipList] = React.useState([]);
+  const [selectedMembership, setSelectedMembership] = React.useState("Select");
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -172,7 +187,7 @@ function ClientDetails() {
           setGender(response.data.gender);
           setShippingAddress(response.data.shippingAddress);
           setBillingAddress(response.data.billingAddress);
-          set_alternate_MobileNumber(response.data.alternate_mobileNumber)
+          set_alternate_MobileNumber(response.data.alternate_mobileNumber);
           set_alternate_Email(response.data.alternate_email);
         })
         .catch((e) => {
@@ -242,6 +257,7 @@ function ClientDetails() {
     getClientsData();
     if (tabIndex === 0) {
       getClientMembershipData();
+      getMembershipList();
     } else if (tabIndex === 4) {
       getClientNotesData();
     }
@@ -250,6 +266,7 @@ function ClientDetails() {
   function handleTabChange(e, newTabIndex) {
     if (newTabIndex === 0) {
       getClientMembershipData();
+      setShowMemberships(true);
     } else if (newTabIndex === 2) {
       getAppointmentScheduleData();
     } else if (newTabIndex === 4) {
@@ -309,6 +326,90 @@ function ClientDetails() {
       });
   };
 
+  const getMembershipList = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/memberships/`, {
+        headers: { "auth-token": token },
+      });
+
+      const membershipListData = [];
+      for (const data of response.data) {
+        membershipListData.push({
+          label: data.name,
+          value: data._id,
+        });
+      }
+      setMembershipList(membershipListData);
+    } catch {
+      swal("Oho! Something went wrong", {
+        icon: "error",
+      });
+    }
+  };
+
+  const addMemberships = () => {
+    const data = {
+      membershipId: selectedMembership.value,
+      paidAmount: paidAmount,
+      countLeft: count,
+      startDate: startDate,
+      endDate: endDate,
+    };
+    const membershipName = selectedMembership.label;
+
+    swal({
+      title: "Are you sure?",
+      text: `You want to add ${membershipName} membership`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((submit) => {
+      if (submit) {
+        axios
+          .post(
+            `${baseUrl}/api/client_memberships/${paramsData
+              .get("id")
+              .toString()}`,
+            data,
+            {
+              headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                "auth-token": token,
+              },
+            }
+          )
+          .then(() => {
+            swal(
+              `Yes! The ${membershipName} membership has been successfully added`,
+              {
+                icon: "success",
+              }
+            );
+            getClientMembershipData();
+            setSelectedMembership("");
+            setPaidAmount("");
+            setCount("");
+            setStartDate("");
+            setEndDate("");
+            setShowMemberships(true);
+          })
+          .catch((error) => {
+            swal("Oho! \n" + error, {
+              icon: "error",
+            });
+            setSelectedMembership("");
+            setPaidAmount("");
+            setCount("");
+            setStartDate("");
+            setEndDate("");
+            setShowMemberships(true);
+          });
+      }
+    });
+  };
+
   return (
     <div
       class="grid grid-flow-row-auto grid-cols-3  gap-4"
@@ -346,11 +447,13 @@ function ClientDetails() {
           <div class="col-span-1">
             {" "}
             <Shows span={1} placeholder="Email:" value={email} />
-           
           </div>
           <Shows placeholder="Alternate Email:" value={alternate_email} />
           <Shows placeholder="Mobile Number:" value={mobileNumber} />
-          <Shows placeholder="Alternate Mobile Number:" value={alternate_mobileNumber} />
+          <Shows
+            placeholder="Alternate Mobile Number:"
+            value={alternate_mobileNumber}
+          />
           <Shows placeholder="Date of Birth:" value={birthDate} />
           <Shows placeholder="Anniversary:" value={anniversary} />
           <Shows placeholder="Occupation:" value={occupation} />
@@ -419,94 +522,153 @@ function ClientDetails() {
         </AppBar>
         <div className={tabIndex === 0 ? "visible" : "hidden"}>
           <div className="flex-row g p-2 gap-2">
-            <span className="p-4 font-weight: inherit; text-2xl">
-              Memberships
-            </span>
-            <div className="pt-2">
-              {" "}
-              <GridComponent
-                dataSource={membershipData}
-                allowPaging={true}
-                //ref={(g) => (grid = g)}
-                pageSettings={{ pageSize: 10 }}
-                // editSettings={editing}
-                toolbar={toolbarOptions}
-                //actionComplete={actionComplete}
-                // toolbarClick={toolbarClick}
-                //recordClick={recordClick}
-                // height= {500}
-                // width= {950}
-                enableInfiniteScrolling={true}
-                infiniteScrollSettings={{ initialBlocks: 5 }}
-                allowResizing={true}
-              >
-                <ColumnsDirective>
-                  {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
-                  <ColumnDirective
-                    field="name"
-                    headerText="Membership Name"
-                    width="80"
+            {showMemberships ? (
+              <div className="pt-2">
+                <span className="p-4 font-weight: inherit; text-2xl">
+                  Memberships
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowMemberships(false)}
+                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  style={{ marginTop: 10 }}
+                >
+                  Add Membership
+                </button>
+                <br></br>
+                <GridComponent
+                  dataSource={membershipData}
+                  allowPaging={true}
+                  //ref={(g) => (grid = g)}
+                  pageSettings={{ pageSize: 10 }}
+                  // editSettings={editing}
+                  toolbar={toolbarOptions}
+                  //actionComplete={actionComplete}
+                  // toolbarClick={toolbarClick}
+                  //recordClick={recordClick}
+                  // height= {500}
+                  // width= {950}
+                  enableInfiniteScrolling={true}
+                  infiniteScrollSettings={{ initialBlocks: 5 }}
+                  allowResizing={true}
+                >
+                  <ColumnsDirective>
+                    {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+                    <ColumnDirective
+                      field="name"
+                      headerText="Membership Name"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="startDate"
+                      headerText="Start Date"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="endDate"
+                      headerText="End Date"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="duration"
+                      headerText="isValid"
+                      width="100"
+                    />
+                    <ColumnDirective
+                      field="count"
+                      headerText="Total Session"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="countLeft"
+                      headerText="Session Left"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="hsnCode"
+                      headerText="Hsn Code"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="cost"
+                      headerText="Cost"
+                      width="80"
+                    />
+                    <ColumnDirective
+                      field="_id"
+                      headerText="Action"
+                      minWidth="100"
+                      width="80"
+                      maxWidth="300"
+                      isPrimaryKey={true}
+                      template={holdAndResumeActionButtons}
+                    />
+                  </ColumnsDirective>
+                  <Inject
+                    services={[
+                      Page,
+                      Edit,
+                      Toolbar,
+                      InfiniteScroll,
+                      Resize,
+                      Sort,
+                      ContextMenu,
+                      Filter,
+                      ExcelExport,
+                      Edit,
+                      PdfExport,
+                      Search,
+                      Resize,
+                    ]}
                   />
-                  <ColumnDirective
-                    field="startDate"
-                    headerText="Start Date"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="endDate"
-                    headerText="End Date"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="duration"
-                    headerText="isValid"
-                    width="100"
-                  />
-                  <ColumnDirective
-                    field="count"
-                    headerText="Total Session"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="countLeft"
-                    headerText="Session Left"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="hsnCode"
-                    headerText="Hsn Code"
-                    width="80"
-                  />
-                  <ColumnDirective field="cost" headerText="Cost" width="80" />
-                  <ColumnDirective
-                    field="_id"
-                    headerText="Action"
-                    minWidth="100"
-                    width="80"
-                    maxWidth="300"
-                    isPrimaryKey={true}
-                    template={holdAndResumeActionButtons}
-                  />
-                </ColumnsDirective>
-                <Inject
-                  services={[
-                    Page,
-                    Edit,
-                    Toolbar,
-                    InfiniteScroll,
-                    Resize,
-                    Sort,
-                    ContextMenu,
-                    Filter,
-                    ExcelExport,
-                    Edit,
-                    PdfExport,
-                    Search,
-                    Resize,
-                  ]}
-                />
-              </GridComponent>
-            </div>
+                </GridComponent>
+              </div>
+            ) : (
+              <div className="grid justify-items-stretch grid-cols-5 gap-4">
+                <InputSearch
+                  name="selectedMembership"
+                  placeholder="Memberships"
+                  options={membershipList}
+                  value={selectedMembership}
+                  onchange={(event) => setSelectedMembership(event)}
+                ></InputSearch>
+                <Input
+                  name="paidAmount"
+                  type="number"
+                  value={paidAmount}
+                  placeholder="Paid Amount"
+                  onChange={(event) => setPaidAmount(event.target.value)}
+                ></Input>
+                <Input
+                  name="countLeft"
+                  type="number"
+                  value={count}
+                  placeholder="Count"
+                  onChange={(event) => setCount(event.target.value)}
+                ></Input>
+                <Input
+                  name="startDate"
+                  type="date"
+                  placeholder="Start Date"
+                  value={startDate}
+                  onChange={(event) => setStartDate(event.target.value)}
+                ></Input>
+                <Input
+                  name="endDate"
+                  type="date"
+                  placeholder="End Date"
+                  value={endDate}
+                  onChange={(event) => setEndDate(event.target.value)}
+                ></Input>
+                <button
+                  type="button"
+                  onClick={() => addMemberships()}
+                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                >
+                  Add
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div className={tabIndex === 1 ? "visible" : "hidden"}>
