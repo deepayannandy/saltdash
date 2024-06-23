@@ -437,7 +437,7 @@ function AddMemberships() {
           className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
           type="submit"
         >
-          SUBMIT
+        {pathParams.get("id")? "Update": "Submit"}
         </button>
       </form>
     </div>
