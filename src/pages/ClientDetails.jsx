@@ -31,6 +31,7 @@ import {
 import { BsArrowLeftShort } from "react-icons/bs";
 import Card from "../components/Card";
 import { TextField } from "@mui/material";
+import { format } from "date-fns";
 
 function ClientDetails() {
   let grid;
@@ -71,6 +72,7 @@ function ClientDetails() {
   const [endDate, setEndDate] = React.useState("");
   const [membershipList, setMembershipList] = React.useState([]);
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
+  const [allMembershipData, setAllMembershipData] = React.useState([]);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -267,6 +269,11 @@ function ClientDetails() {
     if (newTabIndex === 0) {
       getClientMembershipData();
       setShowMemberships(true);
+      setSelectedMembership("Select");
+      setPaidAmount("");
+      setCount("");
+      setStartDate("");
+      setEndDate("");
     } else if (newTabIndex === 2) {
       getAppointmentScheduleData();
     } else if (newTabIndex === 4) {
@@ -332,6 +339,7 @@ function ClientDetails() {
         headers: { "auth-token": token },
       });
 
+      setAllMembershipData(response.data);
       const membershipListData = [];
       for (const data of response.data) {
         membershipListData.push({
@@ -388,7 +396,7 @@ function ClientDetails() {
               }
             );
             getClientMembershipData();
-            setSelectedMembership("");
+            setSelectedMembership("Select");
             setPaidAmount("");
             setCount("");
             setStartDate("");
@@ -399,7 +407,7 @@ function ClientDetails() {
             swal("Oho! \n" + error, {
               icon: "error",
             });
-            setSelectedMembership("");
+            setSelectedMembership("Select");
             setPaidAmount("");
             setCount("");
             setStartDate("");
@@ -410,9 +418,41 @@ function ClientDetails() {
     });
   };
 
+  const handleMembershipSelect = (event) => {
+    setSelectedMembership(event);
+    const membership = allMembershipData.find((membershipDetails) => membershipDetails._id === event.value);
+    if (membership) {
+      const currentDate = new Date();
+      const startDate = format(currentDate, "yyyy-MM-dd");
+      const endDate = membership.validity ? currentDate.setDate(
+        currentDate.getDate() + membership.validity
+      ): currentDate;
+      const formattedEndDate = format(endDate, "yyyy-MM-dd");
+      setPaidAmount(membership.sellingCost);
+      setCount(membership.count);
+      setStartDate(startDate);
+      setEndDate(formattedEndDate);
+    }
+  }
+
+  const handleChangeStartDate = (value) => {
+    setStartDate(value);
+    const membership = allMembershipData.find(
+      (membershipDetails) => membershipDetails._id === selectedMembership.value
+    );
+    if (membership) {
+      const startDate = new Date(value);
+      const endDate = membership.validity
+        ? startDate.setDate(startDate.getDate() + membership.validity)
+        : startDate;
+      const formattedEndDate = format(endDate, "yyyy-MM-dd");
+      setEndDate(formattedEndDate);
+    }
+  }
+
   return (
     <div
-      class="grid grid-flow-row-auto grid-cols-3  gap-4"
+      className="grid grid-flow-row-auto grid-cols-3  gap-4"
       style={{
         overflow: "scroll",
         position: "fixed",
@@ -421,7 +461,7 @@ function ClientDetails() {
         paddingBottom: "80px",
       }}
     >
-      <div class="col-span-3 border bg-white rounded-md shadow-md p-5 ">
+      <div className="col-span-3 border bg-white rounded-md shadow-md p-5 ">
         <BsArrowLeftShort
           style={{ left: "107px" }}
           className="text-gray-700 text-3xl top-20 cursor-pointer"
@@ -434,17 +474,17 @@ function ClientDetails() {
           <button
             type="button"
             onClick={deleteClientData}
-            class=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
+            className=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
           >
             Delete
           </button>
         </div>
-        <div class="grid py-3  grid-flow-row-dense grid-cols-4 gap-2 grid-rows-2 ...">
+        <div className="grid py-3  grid-flow-row-dense grid-cols-4 gap-2 grid-rows-2 ...">
           <Shows
             placeholder="Client Name:"
             value={firstName + " " + lastName}
           />
-          <div class="col-span-1">
+          <div className="col-span-1">
             {" "}
             <Shows span={1} placeholder="Email:" value={email} />
           </div>
@@ -471,7 +511,7 @@ function ClientDetails() {
           <div />
         )}
         {clientType !== "Individual" ? (
-          <div class="grid py-3 grid-flow-row-dense grid-cols-4 gap-2 grid-rows-1 ...">
+          <div className="grid py-3 grid-flow-row-dense grid-cols-4 gap-2 grid-rows-1 ...">
             <Shows placeholder="PAN:" value={pan} />
             <Shows placeholder="GST:" value={gst} />
             <Shows placeholder="Company Legal Name:" value={companyLegalName} />
@@ -489,7 +529,7 @@ function ClientDetails() {
         </div>
         <div className="grid grid-cols-2 gap-3  items-center">
           <div className="items-center">
-            <label class="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Shipping Address:
             </label>
             <textarea
@@ -500,7 +540,7 @@ function ClientDetails() {
             />
           </div>
           <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Billing Address:
             </label>
             <textarea
@@ -530,7 +570,7 @@ function ClientDetails() {
                 <button
                   type="button"
                   onClick={() => setShowMemberships(false)}
-                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                   style={{ marginTop: 10 }}
                 >
                   Add Membership
@@ -630,13 +670,14 @@ function ClientDetails() {
                   placeholder="Memberships"
                   options={membershipList}
                   value={selectedMembership}
-                  onchange={(event) => setSelectedMembership(event)}
+                  onchange={(event) => handleMembershipSelect(event)}
                 ></InputSearch>
                 <Input
                   name="paidAmount"
                   type="number"
                   value={paidAmount}
                   placeholder="Paid Amount"
+                  disabled={true}
                   onChange={(event) => setPaidAmount(event.target.value)}
                 ></Input>
                 <Input
@@ -644,6 +685,7 @@ function ClientDetails() {
                   type="number"
                   value={count}
                   placeholder="Count"
+                  disabled={true}
                   onChange={(event) => setCount(event.target.value)}
                 ></Input>
                 <Input
@@ -651,19 +693,20 @@ function ClientDetails() {
                   type="date"
                   placeholder="Start Date"
                   value={startDate}
-                  onChange={(event) => setStartDate(event.target.value)}
+                  onChange={(event) => handleChangeStartDate(event.target.value)}
                 ></Input>
                 <Input
                   name="endDate"
                   type="date"
                   placeholder="End Date"
                   value={endDate}
+                  disabled={true}
                   onChange={(event) => setEndDate(event.target.value)}
                 ></Input>
                 <button
                   type="button"
                   onClick={() => addMemberships()}
-                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                 >
                   Add
                 </button>
@@ -920,7 +963,7 @@ function ClientDetails() {
               <button
                 type="button"
                 onClick={() => setShowNotes(false)}
-                class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                 style={{ marginTop: 10 }}
               >
                 Add Note
@@ -961,10 +1004,10 @@ function ClientDetails() {
           )}
         </div>
       </div>
-      {/* <div class="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
+      {/* <div className="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
             <Header category="" title= "Purchase History" />
             <Divider className='p-1'/>
-            <label class="block text-gray-700 text-sm  py-2  font-bold mb-2">No data found !</label>
+            <label className="block text-gray-700 text-sm  py-2  font-bold mb-2">No data found !</label>
             </div> */}
     </div>
   );
