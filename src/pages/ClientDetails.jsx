@@ -452,7 +452,7 @@ function ClientDetails() {
 
   return (
     <div
-      class="grid grid-flow-row-auto grid-cols-3  gap-4"
+      className="grid grid-flow-row-auto grid-cols-3  gap-4"
       style={{
         overflow: "scroll",
         position: "fixed",
@@ -461,7 +461,7 @@ function ClientDetails() {
         paddingBottom: "80px",
       }}
     >
-      <div class="col-span-3 border bg-white rounded-md shadow-md p-5 ">
+      <div className="col-span-3 border bg-white rounded-md shadow-md p-5 ">
         <BsArrowLeftShort
           style={{ left: "107px" }}
           className="text-gray-700 text-3xl top-20 cursor-pointer"
@@ -474,17 +474,17 @@ function ClientDetails() {
           <button
             type="button"
             onClick={deleteClientData}
-            class=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
+            className=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
           >
             Delete
           </button>
         </div>
-        <div class="grid py-3  grid-flow-row-dense grid-cols-4 gap-2 grid-rows-2 ...">
+        <div className="grid py-3  grid-flow-row-dense grid-cols-4 gap-2 grid-rows-2 ...">
           <Shows
             placeholder="Client Name:"
             value={firstName + " " + lastName}
           />
-          <div class="col-span-1">
+          <div className="col-span-1">
             {" "}
             <Shows span={1} placeholder="Email:" value={email} />
           </div>
@@ -511,7 +511,7 @@ function ClientDetails() {
           <div />
         )}
         {clientType !== "Individual" ? (
-          <div class="grid py-3 grid-flow-row-dense grid-cols-4 gap-2 grid-rows-1 ...">
+          <div className="grid py-3 grid-flow-row-dense grid-cols-4 gap-2 grid-rows-1 ...">
             <Shows placeholder="PAN:" value={pan} />
             <Shows placeholder="GST:" value={gst} />
             <Shows placeholder="Company Legal Name:" value={companyLegalName} />
@@ -529,7 +529,7 @@ function ClientDetails() {
         </div>
         <div className="grid grid-cols-2 gap-3  items-center">
           <div className="items-center">
-            <label class="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Shipping Address:
             </label>
             <textarea
@@ -540,7 +540,7 @@ function ClientDetails() {
             />
           </div>
           <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Billing Address:
             </label>
             <textarea
@@ -570,7 +570,7 @@ function ClientDetails() {
                 <button
                   type="button"
                   onClick={() => setShowMemberships(false)}
-                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                   style={{ marginTop: 10 }}
                 >
                   Add Membership
@@ -706,7 +706,7 @@ function ClientDetails() {
                 <button
                   type="button"
                   onClick={() => addMemberships()}
-                  class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                 >
                   Add
                 </button>
@@ -963,7 +963,7 @@ function ClientDetails() {
               <button
                 type="button"
                 onClick={() => setShowNotes(false)}
-                class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                 style={{ marginTop: 10 }}
               >
                 Add Note
@@ -1004,10 +1004,10 @@ function ClientDetails() {
           )}
         </div>
       </div>
-      {/* <div class="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
+      {/* <div className="col-span-1 border bg-white rounded-md shadow-md  p-5"> 
             <Header category="" title= "Purchase History" />
             <Divider className='p-1'/>
-            <label class="block text-gray-700 text-sm  py-2  font-bold mb-2">No data found !</label>
+            <label className="block text-gray-700 text-sm  py-2  font-bold mb-2">No data found !</label>
             </div> */}
     </div>
   );
