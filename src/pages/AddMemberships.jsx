@@ -384,22 +384,22 @@ function AddMemberships() {
           Added Services
         </label>
         <div class="p-1">
-          <table class="w-5/6  border">
+          <table class="w-5/6 table-auto border  border-slate-700">
             <thead>
               <tr>
-                <th class="font-bold py-2 px-4 border-b border-l border-r text-left">
+                <th class="font-bold py-2 px-4 border  border-slate-700 text-left">
                   Service Name
                 </th>
-                <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th class="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Duration
                 </th>
-                <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th class="font-bold py-2 px-4 border  border-slate-700 text-left">
                   Price
                 </th>
-                <th class="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th class="font-bold py-2 px-4 border border-slate-700 text-left">
                   Count
                 </th>
-                <th className="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Actions
                 </th>
               </tr>
@@ -407,11 +407,11 @@ function AddMemberships() {
             <tbody>
               {selectedService.map((sr) => (
                 <tr>
-                  <td class="border border-slate-700 ...">{sr.name}</td>
-                  <td class="border border-slate-700 ...">{sr.duration}</td>
-                  <td class="border border-slate-700 ...">{sr.sellingCost}</td>
-                  <td class="border border-slate-700 ...">{sr.count}</td>
-                  <td className="border border-slate-700 ...">
+                  <td class="border py-2 px-4 border-slate-700 ...">{sr.name}</td>
+                  <td class="border py-2 px-4 border-slate-700 ...">{sr.duration}</td>
+                  <td class="border py-2 px-4 border-slate-700 ...">{sr.sellingCost}</td>
+                  <td class="border py-2 px-4 border-slate-700 ...">{sr.count}</td>
+                  <td className="border py-2 px-4 border-slate-700 ...">
                     <button
                       type="button"
                       style={{ background: "#B22222" }}
