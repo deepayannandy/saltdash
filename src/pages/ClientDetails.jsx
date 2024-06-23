@@ -31,6 +31,7 @@ import {
 import { BsArrowLeftShort } from "react-icons/bs";
 import Card from "../components/Card";
 import { TextField } from "@mui/material";
+import { format } from "date-fns";
 
 function ClientDetails() {
   let grid;
@@ -71,6 +72,7 @@ function ClientDetails() {
   const [endDate, setEndDate] = React.useState("");
   const [membershipList, setMembershipList] = React.useState([]);
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
+  const [allMembershipData, setAllMembershipData] = React.useState([]);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -267,6 +269,11 @@ function ClientDetails() {
     if (newTabIndex === 0) {
       getClientMembershipData();
       setShowMemberships(true);
+      setSelectedMembership("Select");
+      setPaidAmount("");
+      setCount("");
+      setStartDate("");
+      setEndDate("");
     } else if (newTabIndex === 2) {
       getAppointmentScheduleData();
     } else if (newTabIndex === 4) {
@@ -332,6 +339,7 @@ function ClientDetails() {
         headers: { "auth-token": token },
       });
 
+      setAllMembershipData(response.data);
       const membershipListData = [];
       for (const data of response.data) {
         membershipListData.push({
@@ -388,7 +396,7 @@ function ClientDetails() {
               }
             );
             getClientMembershipData();
-            setSelectedMembership("");
+            setSelectedMembership("Select");
             setPaidAmount("");
             setCount("");
             setStartDate("");
@@ -399,7 +407,7 @@ function ClientDetails() {
             swal("Oho! \n" + error, {
               icon: "error",
             });
-            setSelectedMembership("");
+            setSelectedMembership("Select");
             setPaidAmount("");
             setCount("");
             setStartDate("");
@@ -409,6 +417,38 @@ function ClientDetails() {
       }
     });
   };
+
+  const handleMembershipSelect = (event) => {
+    setSelectedMembership(event);
+    const membership = allMembershipData.find((membershipDetails) => membershipDetails._id === event.value);
+    if (membership) {
+      const currentDate = new Date();
+      const startDate = format(currentDate, "yyyy-MM-dd");
+      const endDate = membership.validity ? currentDate.setDate(
+        currentDate.getDate() + membership.validity
+      ): currentDate;
+      const formattedEndDate = format(endDate, "yyyy-MM-dd");
+      setPaidAmount(membership.sellingCost);
+      setCount(membership.count);
+      setStartDate(startDate);
+      setEndDate(formattedEndDate);
+    }
+  }
+
+  const handleChangeStartDate = (value) => {
+    setStartDate(value);
+    const membership = allMembershipData.find(
+      (membershipDetails) => membershipDetails._id === selectedMembership.value
+    );
+    if (membership) {
+      const startDate = new Date(value);
+      const endDate = membership.validity
+        ? startDate.setDate(startDate.getDate() + membership.validity)
+        : startDate;
+      const formattedEndDate = format(endDate, "yyyy-MM-dd");
+      setEndDate(formattedEndDate);
+    }
+  }
 
   return (
     <div
@@ -630,13 +670,14 @@ function ClientDetails() {
                   placeholder="Memberships"
                   options={membershipList}
                   value={selectedMembership}
-                  onchange={(event) => setSelectedMembership(event)}
+                  onchange={(event) => handleMembershipSelect(event)}
                 ></InputSearch>
                 <Input
                   name="paidAmount"
                   type="number"
                   value={paidAmount}
                   placeholder="Paid Amount"
+                  disabled={true}
                   onChange={(event) => setPaidAmount(event.target.value)}
                 ></Input>
                 <Input
@@ -644,6 +685,7 @@ function ClientDetails() {
                   type="number"
                   value={count}
                   placeholder="Count"
+                  disabled={true}
                   onChange={(event) => setCount(event.target.value)}
                 ></Input>
                 <Input
@@ -651,13 +693,14 @@ function ClientDetails() {
                   type="date"
                   placeholder="Start Date"
                   value={startDate}
-                  onChange={(event) => setStartDate(event.target.value)}
+                  onChange={(event) => handleChangeStartDate(event.target.value)}
                 ></Input>
                 <Input
                   name="endDate"
                   type="date"
                   placeholder="End Date"
                   value={endDate}
+                  disabled={true}
                   onChange={(event) => setEndDate(event.target.value)}
                 ></Input>
                 <button
