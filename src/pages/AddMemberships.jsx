@@ -167,7 +167,7 @@ function AddMemberships() {
     e.preventDefault();
     const data = new FormData(e.target);
     let receivedData = Object.fromEntries(data.entries());
-    const serviceIds = selectedService.map((service) => { return { id: service._id, count: service.count } });
+    const serviceIds = selectedService.map((service) => service._id);
     receivedData.serviceIds = serviceIds;
     receivedData.isUnlimited = isUnlimited;
 
@@ -253,15 +253,13 @@ function AddMemberships() {
 
   const addEquipments = (e) => {
     if (selectedServiceName.length > 1 && selectedServiceName !== "Select") {
-      const serviceWithCount = srs.get(selectedServiceName);
-      serviceWithCount.count = count;
-      setCount(0);
-      setSelectedService([...selectedService, serviceWithCount]);
+      const service = srs.get(selectedServiceName);
+      setSelectedService([...selectedService, service]);
     }
   };
 
     function removeService(service) {
-      const newList = selectedService.filter((li) => li.name !== service.name || li.count !== service.count);
+      const newList = selectedService.filter((li) => li.name !== service.name);
       setSelectedService(newList);
   }
   
@@ -321,9 +319,10 @@ function AddMemberships() {
           <Input key={inputs[2].id} {...inputs[2]}></Input>
           <Input key={inputs[3].id} {...inputs[3]}></Input>
           <Input key={inputs[4].id} {...inputs[4]}></Input>
+          <Input key={inputs[5].id} {...inputs[5]}></Input>
           <Input key={inputs[7].id} {...inputs[7]}></Input>
           {/* <Input key={inputs[6].id} {...inputs[6]}></Input> */}
-          <div class="flex items-center">
+          <div style={{margin: 10}} class="flex items-center">
             <input
               name="isUnlimited"
               checked={isUnlimited}
@@ -371,7 +370,6 @@ function AddMemberships() {
               </div>
             </div>
           </div>
-          <Input key={inputs[5].id} {...inputs[5]}></Input>
           <button
             className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
             type="button"
@@ -396,9 +394,6 @@ function AddMemberships() {
                 <th class="font-bold py-2 px-4 border  border-slate-700 text-left">
                   Price
                 </th>
-                <th class="font-bold py-2 px-4 border border-slate-700 text-left">
-                  Count
-                </th>
                 <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Actions
                 </th>
@@ -407,10 +402,15 @@ function AddMemberships() {
             <tbody>
               {selectedService.map((sr) => (
                 <tr>
-                  <td class="border py-2 px-4 border-slate-700 ...">{sr.name}</td>
-                  <td class="border py-2 px-4 border-slate-700 ...">{sr.duration}</td>
-                  <td class="border py-2 px-4 border-slate-700 ...">{sr.sellingCost}</td>
-                  <td class="border py-2 px-4 border-slate-700 ...">{sr.count}</td>
+                  <td class="border py-2 px-4 border-slate-700 ...">
+                    {sr.name}
+                  </td>
+                  <td class="border py-2 px-4 border-slate-700 ...">
+                    {sr.duration}
+                  </td>
+                  <td class="border py-2 px-4 border-slate-700 ...">
+                    {sr.sellingCost}
+                  </td>
                   <td className="border py-2 px-4 border-slate-700 ...">
                     <button
                       type="button"
@@ -437,7 +437,7 @@ function AddMemberships() {
           className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
           type="submit"
         >
-        {pathParams.get("id")? "Update": "Submit"}
+          {pathParams.get("id") ? "Update" : "Submit"}
         </button>
       </form>
     </div>

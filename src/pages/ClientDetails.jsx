@@ -209,7 +209,16 @@ function ClientDetails() {
           { headers: { "auth-token": token } }
         )
         .then((response) => {
-          setMembershipData(response.data);
+          const membershipDetails = [];
+          for (const data of response.data) {
+            const membershipServiceName = `${data.name} (${data.serviceName})`;
+            membershipDetails.push({
+              membershipServiceName,
+              ...data,
+            })
+          }
+          
+          setMembershipData(membershipDetails);
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -595,7 +604,7 @@ function ClientDetails() {
                   <ColumnsDirective>
                     {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
                     <ColumnDirective
-                      field="name"
+                      field="membershipServiceName"
                       headerText="Membership Name"
                       width="80"
                     />
@@ -693,7 +702,9 @@ function ClientDetails() {
                   type="date"
                   placeholder="Start Date"
                   value={startDate}
-                  onChange={(event) => handleChangeStartDate(event.target.value)}
+                  onChange={(event) =>
+                    handleChangeStartDate(event.target.value)
+                  }
                 ></Input>
                 <Input
                   name="endDate"
