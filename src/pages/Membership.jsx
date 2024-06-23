@@ -167,50 +167,50 @@ function Membership() {
             <ColumnDirective
               field="count"
               headerText="Number Of Sessions"
-              minWidth="100"
-              width="150"
+              minWidth="10"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
               field="isUnlimited"
               headerText="is Unlimited"
-              minWidth="100"
-              width="150"
+              minWidth="10"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
               field="validity"
               headerText="Validity"
-              minWidth="100"
-              width="150"
-              maxWidth="300"
+              minWidth="70"
+              width="80"
+              maxWidth="80"
             />
             <ColumnDirective
               field="cost"
               headerText="Original Price"
               minWidth="100"
-              width="150"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
               field="sellingCost"
               headerText="Selling Price"
               minWidth="100"
-              width="150"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
               field="hsnCode"
               headerText="Hsn Code"
               minWidth="100"
-              width="150"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
               field="taxRate"
               headerText="Tax Rate"
               minWidth="100"
-              width="150"
+              width="100"
               maxWidth="300"
             />
             <ColumnDirective
