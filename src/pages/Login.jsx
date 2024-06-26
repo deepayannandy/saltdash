@@ -30,6 +30,7 @@ const Login = () => {
       .then((data) => {
         localStorage.setItem("userinfo", data.data);
         localStorage.setItem("username", receivedData.email);
+        window.location.reload(false);
         navigate("/dashboard");
       })
       .catch((error) => {

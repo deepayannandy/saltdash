@@ -74,6 +74,7 @@ function Header() {
 									<div
                                         onClick={() => {
 											localStorage.clear();
+											window.location.reload(false);
    											navigate('/Login');
 										}}
 										className={classNames(
