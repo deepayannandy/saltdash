@@ -278,6 +278,7 @@ function ClientDetails() {
     if (newTabIndex === 0) {
       getClientMembershipData();
       setShowMemberships(true);
+      getMembershipList();
       setSelectedMembership("Select");
       setPaidAmount("");
       setCount("");
