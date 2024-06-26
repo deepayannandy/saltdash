@@ -42,7 +42,7 @@ function Services() {
       });
       setServiceData(response.data);
     } catch (error) {
-      swal(error, {
+      swal("Oho! \n" + error, {
         icon: "error",
       });
     }
@@ -109,7 +109,7 @@ function Services() {
               getData();
             })
             .catch((error) => {
-              swal(error, {
+              swal("Oho! \n" + error, {
                 icon: "error",
               });
             });

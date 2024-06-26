@@ -330,14 +330,12 @@ function AddAppointment() {
       {
         service: { label: "Select", value: "" },
         duration: "",
-        scheduleDate: pathParams.get("startTime") ? format(
-          new Date(pathParams.get("startTime")),
-          "yyyy-MM-dd"
-        ) : "",
-        time: pathParams.get("startTime") ? format(
-          new Date(pathParams.get("startTime")),
-          "HH:mm"
-        ) : "",
+        scheduleDate: pathParams.get("startTime")
+          ? format(new Date(pathParams.get("startTime")), "yyyy-MM-dd")
+          : "",
+        time: pathParams.get("startTime")
+          ? format(new Date(pathParams.get("startTime")), "HH:mm")
+          : "",
       },
     ]);
 
@@ -369,29 +367,26 @@ function AddAppointment() {
           setMembershipList(membershipData);
         } else {
           setIsMembership(false);
+        }
 
-          try {
-            const servicesResponse = await axios.get(
-              `${baseUrl}/api/services/`,
-              {
-                headers: {
-                  "auth-token": token,
-                },
-              }
-            );
-            if (servicesResponse.data) {
-              const servicesData = [];
-              for (const service of servicesResponse.data) {
-                servicesData.push({ label: service.name, value: service._id });
-              }
-              setServicesList(servicesData);
-              setServicesData(servicesResponse.data);
+        try {
+          const servicesResponse = await axios.get(`${baseUrl}/api/services/`, {
+            headers: {
+              "auth-token": token,
+            },
+          });
+          if (servicesResponse.data) {
+            const servicesData = [];
+            for (const service of servicesResponse.data) {
+              servicesData.push({ label: service.name, value: service._id });
             }
-          } catch (error) {
-            swal("Oho! \n" + error, {
-              icon: "error",
-            });
+            setServicesList(servicesData);
+            setServicesData(servicesResponse.data);
           }
+        } catch (error) {
+          swal("Oho! \n" + error, {
+            icon: "error",
+          });
         }
       }
     } catch (error) {
@@ -432,10 +427,10 @@ function AddAppointment() {
           }
         }
       }
-    } else {
-      if (servicesData) {
-        service = servicesData.find((service) => service._id === event.value);
-      }
+    }
+
+    if (servicesData && !service) {
+      service = servicesData.find((service) => service._id === event.value);
     }
 
     if (service) {
