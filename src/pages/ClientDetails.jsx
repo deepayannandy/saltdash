@@ -252,18 +252,10 @@ function ClientDetails() {
       axios
         .get(
           `${baseUrl}/api/client_memberships/` +
-            paramsData.get("id").toString(),
+            paramsData.get("id").toString()+`&all`,
           { headers: { "auth-token": token } }
         )
         .then((response) => {
-          // const membershipDetails = [];
-          // for (const data of response.data) {
-          //   const membershipServiceName = `${data.name} (${data.serviceName})`;
-          //   membershipDetails.push({
-          //     membershipServiceName,
-          //     ...data,
-          //   })
-          // }
           console.log(">>>");
           console.log(response.data);
           setMembershipData(response.data);
@@ -359,36 +351,75 @@ function ClientDetails() {
     }
   };
 
+  const handleMembershipRemove= async (membershipid)=>{
+    console.log( `lets remove ${membershipid} ${paramsData.get("id").toString()}`)
+    swal({
+      title: "Are you sure?",
+      text: `You want to delete the selected membership`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((submit) => {
+      if (submit) {
+    axios
+    .delete(
+      `${baseUrl}/api/client_memberships/${membershipid}&${paramsData.get("id").toString()}`,
+      {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          "auth-token": token,
+        },
+      }
+    )
+    .then(() => {
+      swal("Membership removed successfully", {
+        icon: "success",
+      });
+      getClientMembershipData()
+    })
+    .catch((error) => {
+      swal(error.response?.data ?? error.message, {
+        icon: "failed",
+      });
+    });
+  }
+    });
+
+  }
+
   const handleNoteFormSubmit = async (event) => {
     event.preventDefault();
     const formElements = event.currentTarget.elements;
     const formData = { note: formElements.note.value };
-
-    axios
-      .post(
-        `${baseUrl}/api/notes/` + paramsData.get("id").toString(),
-        formData,
-        {
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            "auth-token": token,
-          },
-        }
-      )
-      .then(() => {
-        swal("Note added", {
-          icon: "success",
+    
+      axios
+        .post(
+          `${baseUrl}/api/notes/` + paramsData.get("id").toString(),
+          formData,
+          {
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              "auth-token": token,
+            },
+          }
+        )
+        .then(() => {
+          swal("Note added", {
+            icon: "success",
+          });
+          setTabIndex(4);
+          setShowNotes(true);
+          getClientNotesData();
+        })
+        .catch((error) => {
+          swal(error.response?.data ?? error.message, {
+            icon: "failed",
+          });
+          setTabIndex(4);
         });
-        setTabIndex(4);
-        setShowNotes(true);
-        getClientNotesData();
-      })
-      .catch((error) => {
-        swal(error.response?.data ?? error.message, {
-          icon: "failed",
-        });
-        setTabIndex(4);
-      });
+     
   };
 
   const getMembershipList = async () => {
@@ -642,12 +673,41 @@ function ClientDetails() {
                 >
                   Add Membership
                 </button>
-                <br></br>
+                <div className="grid grid-cols-3 gap-2">
                 {
                   membershipData.map(
-                    membership=> <ul>{membership.membershipServiceName}</ul>
+                    membership=> <Card className="mt-6 w-96 shadow-[rgba(75,75,75,0.40)_0px_3px_8px]">
+                    <CardBody>
+                      <Typography variant="h5" color="blue-gray" className="mb-2">
+                       {membership.name}
+                      {new Date() < new Date(membership.endDate) ? <span class="bg-blue-100 text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-teal-800 ms-3">Active</span>:  <span class="bg-blue-100 text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-red-600 ms-3">Exp</span>}
+                      </Typography>
+                      <Typography>
+                      {membership.description}
+                      </Typography>
+                      <div className=" mt-2">
+                      {membership.services.map(service=> <div className="flex items-center">Service: {service.name} <span class= {service.sessions<5 ?"bg-blue-100  text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3":"bg-blue-100  text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"}>Qnt: {service.sessions}</span>  </div>)}
+                      </div >
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                      <div class="flex flex-col items-center justify-center">
+                        <dt class="mb-1 text-1xl font-extrabold">{membership.startDate.split("T")[0]}</dt>
+                        <dd class="text-gray-500 dark:text-gray-400">Start Date</dd>
+                      </div>
+                      <div class="flex flex-col items-center justify-center">
+                        <dt class="mb-1 text-1xl font-extrabold">{membership.endDate.split("T")[0]}</dt>
+                        <dd class="text-gray-500 dark:text-gray-400">End Date</dd>
+                      </div>
+                      </div>
+                      <div class="flex mt-4 md:mt-6">
+                        <button  class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pause</button>
+                        <button class="py-2 px-4 ms-2 text-sm font-medium text-white focus:outline-none bg-teal-600 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Resume</button>
+                        <button onClick={()=>handleMembershipRemove(membership._id)} class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Remove</button>
+                      </div>
+                    </CardBody>
+                  </Card>
                   )
                 }
+                </div>
               </div>
             ) : (
               <div className="grid justify-items-stretch grid-cols-4 gap-4">

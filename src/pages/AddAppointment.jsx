@@ -361,19 +361,7 @@ function AddAppointment() {
       if (response.data) {
         const data = response.data;
         setClientData(data);
-        const membershipData = [];
-        if (data.clientMemberships.length) {
-          setIsMembership(true);
-          for (const clientMembership of data.clientMemberships) {
-            membershipData.push({
-              label: clientMembership.name,
-              value: clientMembership._id,
-            });
-          }
-          setMembershipList(membershipData);
-        } else {
-          setIsMembership(false);
-        }
+        getClientMembershipData();
 
         try {
           const servicesResponse = await axios.get(`${baseUrl}/api/services/`, {
@@ -401,6 +389,41 @@ function AddAppointment() {
       });
     }
   }
+  const getClientMembershipData = () => {
+    console.log(`>>>${pathParams.get("clientId").toString()}`)
+    if(pathParams.get("clientId").toString().length>0)
+      axios
+        .get(
+          `${baseUrl}/api/client_memberships/` +
+          pathParams.get("clientId").toString()+`&active`,
+          { headers: { "auth-token": token } }
+        )
+        .then((response) => {
+          console.log(">>>");
+          console.log(response.data);
+          const membershipData = [];
+          const data=response.data;
+        if (data.length) {
+          setIsMembership(true);
+          for (const clientMembership of data) {
+            if( new Date() < new Date(clientMembership.endDate))
+            {membershipData.push({
+              label: clientMembership.name,
+              value: clientMembership._id,
+            });}
+          }
+          setMembershipList(membershipData);
+        } else {
+          setIsMembership(false);
+        }
+         
+        })
+        .catch((e) => {
+          swal("Oho! \n" + e, {
+            icon: "error",
+          });
+        });
+  };
   async function handelClientSelect(event) {
     setSelectedClient({ label: event.label, value: event.value });
     setIsClientSelected(true);
@@ -459,11 +482,14 @@ function AddAppointment() {
 
     if (servicesData && !service) {
       service = servicesData.find((service) => service._id === event.value);
+      console.log("I am called")
     }
+    console.log(service.sessions)
     if (service.sessions===0){
       swal("Oho! \nNo more session left for "+service.name, {
         icon: "error",
       });
+      
       setErrorMessages(`No more session left for ${service.name} please don't make and appointment for this service`)
       newScheduleAppointments[appointmentIndex]["duration"] = 0;
     }
