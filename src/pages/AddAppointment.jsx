@@ -361,7 +361,7 @@ function AddAppointment() {
       if (response.data) {
         const data = response.data;
         setClientData(data);
-        getClientMembershipData();
+        getClientMembershipData(clientid);
 
         try {
           const servicesResponse = await axios.get(`${baseUrl}/api/services/`, {
@@ -389,13 +389,12 @@ function AddAppointment() {
       });
     }
   }
-  const getClientMembershipData = () => {
-    console.log(`>>>${pathParams.get("clientId").toString()}`)
-    if(pathParams.get("clientId").toString().length>0)
+  const getClientMembershipData = (clientId) => {
+    if(clientId!=null)
       axios
         .get(
           `${baseUrl}/api/client_memberships/` +
-          pathParams.get("clientId").toString()+`&active`,
+          clientId+`&active`,
           { headers: { "auth-token": token } }
         )
         .then((response) => {
@@ -423,6 +422,8 @@ function AddAppointment() {
             icon: "error",
           });
         });
+
+        console.log("notable to call get memberships")
   };
   async function handelClientSelect(event) {
     setSelectedClient({ label: event.label, value: event.value });
