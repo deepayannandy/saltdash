@@ -66,7 +66,6 @@ function AddAppointment() {
 
   useEffect(() => {
     getBranchList();
-
     if (pathParams.get("startTime")) {
       const newAppointments = [];
       for (const appointment of scheduledAppointments) {
@@ -107,8 +106,25 @@ function AddAppointment() {
               ")",
             value: client._id,
           });
+          if(pathParams.get("ClientId")){
+            if(client._id===pathParams.get("ClientId")){
+              setSelectedClient(
+              { label:client.firstName +
+                " " +
+                client.lastName +
+                " (" +
+                client.mobileNumber +
+                ")",
+                value: client._id,})
+              setIsClientSelected(true);
+              fetchMemberships(client._id);
+              setIsReschedule(true);
+            }
+            
+          }
         }
         setClientList(clientListData);
+        
       });
   };
 
@@ -227,6 +243,14 @@ function AddAppointment() {
       }
     }
 
+    console.log(appointmentData)
+    console.log(appointmentData.length)
+    if(appointmentData.length<1){
+      swal("Oho! Something went wrong", {
+        icon: "error",
+      });
+    }
+    else{
     const clientName = selectedClient.label;
 
     swal({
@@ -320,31 +344,13 @@ function AddAppointment() {
         }
       }
     });
+  }
   };
 
-  async function handelClientSelect(event) {
-    setSelectedClient({ label: event.label, value: event.value });
-    setIsClientSelected(true);
-
-    setScheduledAppointments([
-      {
-        service: { label: "Select", value: "" },
-        duration: "",
-        scheduleDate: pathParams.get("startTime")
-          ? format(new Date(pathParams.get("startTime")), "yyyy-MM-dd")
-          : "",
-        time: pathParams.get("startTime")
-          ? format(new Date(pathParams.get("startTime")), "HH:mm")
-          : "",
-      },
-    ]);
-
-    setLocation("");
-    setPersonCount(1);
-
+  async function fetchMemberships(clientid){
     try {
       const response = await axios.get(
-        `${baseUrl}/api/clients/` + event.value,
+        `${baseUrl}/api/clients/` + clientid,
         {
           headers: {
             "auth-token": token,
@@ -360,8 +366,8 @@ function AddAppointment() {
           setIsMembership(true);
           for (const clientMembership of data.clientMemberships) {
             membershipData.push({
-              label: clientMembership.membership.name,
-              value: clientMembership.membershipId,
+              label: clientMembership.name,
+              value: clientMembership._id,
             });
           }
           setMembershipList(membershipData);
@@ -395,16 +401,38 @@ function AddAppointment() {
       });
     }
   }
+  async function handelClientSelect(event) {
+    setSelectedClient({ label: event.label, value: event.value });
+    setIsClientSelected(true);
+
+    setScheduledAppointments([
+      {
+        service: { label: "Select", value: "" },
+        duration: "",
+        scheduleDate: pathParams.get("startTime")
+          ? format(new Date(pathParams.get("startTime")), "yyyy-MM-dd")
+          : "",
+        time: pathParams.get("startTime")
+          ? format(new Date(pathParams.get("startTime")), "HH:mm")
+          : "",
+      },
+    ]);
+
+    setLocation("");
+    setPersonCount(1);
+    fetchMemberships(event.value);
+    
+  }
 
   function handelMembershipSelect(event) {
     setSelectedMembership(event);
     const servicesData = [];
     if (clientData.clientMemberships) {
       const clientMembership = clientData.clientMemberships.find(
-        (clientMembership) => clientMembership.membershipId === event.value
+        (clientMembership) => clientMembership._id === event.value
       );
 
-      for (const service of clientMembership.membership.services) {
+      for (const service of clientMembership.services) {
         servicesData.push({ label: service.name, value: service._id });
       }
       setServicesList(servicesData);
@@ -419,7 +447,7 @@ function AddAppointment() {
     if (isMembership) {
       if (clientData.clientMemberships) {
         for (const clientMembership of clientData.clientMemberships) {
-          service = clientMembership.membership.services.find(
+          service = clientMembership.services.find(
             (service) => service._id === event.value
           );
           if (service) {
@@ -432,8 +460,14 @@ function AddAppointment() {
     if (servicesData && !service) {
       service = servicesData.find((service) => service._id === event.value);
     }
-
-    if (service) {
+    if (service.sessions===0){
+      swal("Oho! \nNo more session left for "+service.name, {
+        icon: "error",
+      });
+      setErrorMessages(`No more session left for ${service.name} please don't make and appointment for this service`)
+      newScheduleAppointments[appointmentIndex]["duration"] = 0;
+    }
+    else if (service) {
       newScheduleAppointments[appointmentIndex]["duration"] = service.duration;
       setLocation(service.branch);
     }
@@ -532,11 +566,15 @@ function AddAppointment() {
         <div />
       )}
       <form onSubmit={handleSubmit} className=" bg-white p-8 px-8 rounded-lg">
-        <BsArrowLeftShort
-          style={{ left: "107px" }}
+      {errorMessages.length > 0 ? <BsArrowLeftShort
+          style={{ left: "107px", top: "160px"} }
           className="text-gray-700 text-3xl mt-5  absolute left-23.1 top-20 cursor-pointer "
           onClick={() => navigate(-1)}
-        />
+        />:<BsArrowLeftShort
+        style={{ left: "107px"} }
+        className="text-gray-700 text-3xl mt-5  absolute left-23.1 top-20 cursor-pointer "
+        onClick={() => navigate(-1)}
+      />}
         <Header
           title={
             pathParams.get("id") === "new"
@@ -544,7 +582,7 @@ function AddAppointment() {
               : "Reschedule"
           }
         />
-        <div className=" grid justify-items-stretch grid-cols-3 gap-4">
+        <div className=" grid justify-items-stretch grid-cols-3 gap-4 pb-4">
           <div className="col-span-2 ...">
             <InputSearch
               options={clientList}
@@ -651,9 +689,8 @@ function AddAppointment() {
           type="submit"
         >
           {pathParams.get("id") === "new"
-            ? isMembership === true
-              ? "Deduct from Membership & Schedule"
-              : "Schedule"
+            ? selectedMembership === "Select"
+              ? "Schedule": "Deduct from Membership & Schedule"
             : "Reschedule"}
         </button>
 

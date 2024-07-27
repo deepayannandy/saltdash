@@ -165,24 +165,17 @@ function Membership() {
           <ColumnDirective field='ServiceId' headerText='Service Id' minWidth= '100' width= '150' maxWidth= '300' />
           <ColumnDirective field='SessionType' headerText='Session Type' minWidth= '100' width= '150' maxWidth= '300' /> */}
             <ColumnDirective
-              field="count"
-              headerText="Number Of Sessions"
-              minWidth="10"
-              width="100"
-              maxWidth="300"
-            />
-            <ColumnDirective
               field="isUnlimited"
               headerText="is Unlimited"
               minWidth="10"
-              width="100"
+              width="60"
               maxWidth="300"
             />
             <ColumnDirective
               field="validity"
               headerText="Validity"
               minWidth="70"
-              width="80"
+              width="60"
               maxWidth="80"
             />
             <ColumnDirective
@@ -203,21 +196,21 @@ function Membership() {
               field="hsnCode"
               headerText="Hsn Code"
               minWidth="100"
-              width="100"
+              width="60"
               maxWidth="300"
             />
             <ColumnDirective
               field="taxRate"
               headerText="Tax Rate"
               minWidth="100"
-              width="100"
+              width="60"
               maxWidth="300"
             />
             <ColumnDirective
               field="_id"
               headerText="Action"
               minWidth="100"
-              width="80"
+              width="120"
               maxWidth="300"
               isPrimaryKey={true}
               template={showQR}

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import swal from "sweetalert";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, createSearchParams} from "react-router-dom";
 import {
   Header,
   Shows,
@@ -29,9 +29,16 @@ import {
   Search,
 } from "@syncfusion/ej2-react-grids";
 import { BsArrowLeftShort } from "react-icons/bs";
-import Card from "../components/Card";
+import cCard from "../components/Card";
 import { TextField } from "@mui/material";
 import { format } from "date-fns";
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  Typography,
+  Button,
+} from "@material-tailwind/react";
 
 function ClientDetails() {
   let grid;
@@ -39,6 +46,7 @@ function ClientDetails() {
   const navigate = useNavigate();
   const [clientType, setClientType] = React.useState("Individual");
   const [paramsData] = useSearchParams();
+  const [ClientId, setClientId] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -102,7 +110,7 @@ function ClientDetails() {
       <button
         name="buttonhold"
         style={{ background: "#B22222" }}
-        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
+        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-xs"
       >
         Hold
       </button>
@@ -110,21 +118,38 @@ function ClientDetails() {
       <button
         name="buttondelete"
         style={{ background: "#008000" }}
-        className="edititem text-white py-1 px-2 capitalize rounded-2xl text-md"
+        className="edititem text-white py-1 px-2 capitalize rounded-2xl text-xs"
       >
         Resume
       </button>
+      <div className="w-5" />
+      <button
+        name="buttondelete"
+        style={{ background: "#B22222" }}
+        className="edititem text-white py-1 px-2 capitalize rounded-2xl text-xs"
+      >
+        Remove
+      </button>
     </div>
   );
+  const recordClick = (args) => {
+    if (args.target.name === "buttonreschedule") {
+      console.log(args.rowData)
+      navigate({
+        pathname: "/addappointment",
+        search: createSearchParams({ id: args.rowData._id, clientId: args.rowData.clientId, }).toString(),
+      });
+    }
+  }
 
   const rescheduleActionButtons = () => (
     <div className="flex">
       <button
         name="buttonreschedule"
-        style={{ background: "#B22222" }}
-        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
+        style={{ background: "#008000" }}
+        className="editbooking text-white py-1 px-2  capitalize rounded-2xl text-md"
       >
-        Reschedule
+        Manage
       </button>
       <div className="w-5" />
     </div>
@@ -161,6 +186,27 @@ function ClientDetails() {
       }
     });
   };
+  const bookClientappointment = () => {
+    swal({
+      title: "Are you sure?",
+      text: "You want to book an appointment for " + firstName,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        navigate({
+          pathname: "/addappointment",
+          search: createSearchParams({
+            id: "new",
+            ClientId: ClientId,
+          }).toString(),
+        });
+      }
+    });
+  };
 
   const getClientsData = () => {
     if (paramsData.get("id") !== "new") {
@@ -171,6 +217,7 @@ function ClientDetails() {
           },
         })
         .then((response) => {
+          setClientId(response.data._id)
           setFirstName(response.data.firstName);
           setLastName(response.data.lastName);
           setEmail(response.data.email);
@@ -209,16 +256,17 @@ function ClientDetails() {
           { headers: { "auth-token": token } }
         )
         .then((response) => {
-          const membershipDetails = [];
-          for (const data of response.data) {
-            const membershipServiceName = `${data.name} (${data.serviceName})`;
-            membershipDetails.push({
-              membershipServiceName,
-              ...data,
-            })
-          }
-          
-          setMembershipData(membershipDetails);
+          // const membershipDetails = [];
+          // for (const data of response.data) {
+          //   const membershipServiceName = `${data.name} (${data.serviceName})`;
+          //   membershipDetails.push({
+          //     membershipServiceName,
+          //     ...data,
+          //   })
+          // }
+          console.log(">>>");
+          console.log(response.data);
+          setMembershipData(response.data);
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -439,7 +487,6 @@ function ClientDetails() {
       ): currentDate;
       const formattedEndDate = format(endDate, "yyyy-MM-dd");
       setPaidAmount(membership.sellingCost);
-      setCount(membership.count);
       setStartDate(startDate);
       setEndDate(formattedEndDate);
     }
@@ -487,6 +534,13 @@ function ClientDetails() {
             className=" float-right text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
           >
             Delete
+          </button>
+          <button
+            type="button"
+            onClick={bookClientappointment}
+            className=" float-right text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700 dark:border-red-700"
+          >
+            Book an appointment
           </button>
         </div>
         <div className="grid py-3  grid-flow-row-dense grid-cols-4 gap-2 grid-rows-2 ...">
@@ -550,6 +604,7 @@ function ClientDetails() {
             />
           </div>
           <div>
+
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Billing Address:
             </label>
@@ -561,6 +616,8 @@ function ClientDetails() {
             />
           </div>
         </div>
+        <Divider/>
+        <div className="pt-5"/>
         <AppBar position="static" color="bg-teal-600">
           <Tabs value={tabIndex} onChange={handleTabChange}>
             <Tab label="Memberships" />
@@ -586,95 +643,14 @@ function ClientDetails() {
                   Add Membership
                 </button>
                 <br></br>
-                <GridComponent
-                  dataSource={membershipData}
-                  allowPaging={true}
-                  //ref={(g) => (grid = g)}
-                  pageSettings={{ pageSize: 10 }}
-                  // editSettings={editing}
-                  toolbar={toolbarOptions}
-                  //actionComplete={actionComplete}
-                  // toolbarClick={toolbarClick}
-                  //recordClick={recordClick}
-                  // height= {500}
-                  // width= {950}
-                  enableInfiniteScrolling={true}
-                  infiniteScrollSettings={{ initialBlocks: 5 }}
-                  allowResizing={true}
-                >
-                  <ColumnsDirective>
-                    {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
-                    <ColumnDirective
-                      field="membershipServiceName"
-                      headerText="Membership Name"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="startDate"
-                      headerText="Start Date"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="endDate"
-                      headerText="End Date"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="duration"
-                      headerText="isValid"
-                      width="100"
-                    />
-                    <ColumnDirective
-                      field="count"
-                      headerText="Total Session"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="countLeft"
-                      headerText="Session Left"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="hsnCode"
-                      headerText="Hsn Code"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="cost"
-                      headerText="Cost"
-                      width="80"
-                    />
-                    <ColumnDirective
-                      field="_id"
-                      headerText="Action"
-                      minWidth="100"
-                      width="80"
-                      maxWidth="300"
-                      isPrimaryKey={true}
-                      template={holdAndResumeActionButtons}
-                    />
-                  </ColumnsDirective>
-                  <Inject
-                    services={[
-                      Page,
-                      Edit,
-                      Toolbar,
-                      InfiniteScroll,
-                      Resize,
-                      Sort,
-                      ContextMenu,
-                      Filter,
-                      ExcelExport,
-                      Edit,
-                      PdfExport,
-                      Search,
-                      Resize,
-                    ]}
-                  />
-                </GridComponent>
+                {
+                  membershipData.map(
+                    membership=> <ul>{membership.membershipServiceName}</ul>
+                  )
+                }
               </div>
             ) : (
-              <div className="grid justify-items-stretch grid-cols-5 gap-4">
+              <div className="grid justify-items-stretch grid-cols-4 gap-4">
                 <InputSearch
                   name="selectedMembership"
                   placeholder="Memberships"
@@ -689,14 +665,6 @@ function ClientDetails() {
                   placeholder="Paid Amount"
                   disabled={true}
                   onChange={(event) => setPaidAmount(event.target.value)}
-                ></Input>
-                <Input
-                  name="countLeft"
-                  type="number"
-                  value={count}
-                  placeholder="Count"
-                  disabled={true}
-                  onChange={(event) => setCount(event.target.value)}
                 ></Input>
                 <Input
                   name="startDate"
@@ -718,9 +686,16 @@ function ClientDetails() {
                 <button
                   type="button"
                   onClick={() => addMemberships()}
-                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  className="text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                 >
                   Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMemberships(true)}
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-small rounded-full text-sm px-5 py-2.5 mr-4 mb-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                >
+                  Back
                 </button>
               </div>
             )}
@@ -817,19 +792,13 @@ function ClientDetails() {
               <GridComponent
                 dataSource={appointmentData}
                 allowPaging={true}
-                //ref={(g) => (grid = g)}
                 pageSettings={{ pageSize: 10 }}
-                // editSettings={editing}
                 toolbar={toolbarOptions}
-                // actionComplete={actionComplete}
-                // toolbarClick={toolbarClick}
-                // recordClick={recordClick}
-                // height= {500}
-                // width= {950}
                 enableInfiniteScrolling={true}
                 infiniteScrollSettings={{ initialBlocks: 5 }}
                 allowResizing={true}
                 queryCellInfo={gridCellInfo}
+                recordClick={recordClick}
               >
                 <ColumnsDirective>
                   {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
@@ -982,7 +951,7 @@ function ClientDetails() {
               </button>
               <br></br>
               {clientNotes.map((clientNote, index) => (
-                <Card
+                <cCard
                   note={clientNote.note}
                   date={clientNote.date}
                   color={getCardBackgroundColor(index)}

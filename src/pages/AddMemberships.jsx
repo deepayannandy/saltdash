@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input, Header, InputSelect } from "../form_components";
 import { BsArrowLeftShort } from "react-icons/bs";
 import swal from "sweetalert";
+import { duration } from "moment";
 
 function AddMemberships() {
   const navigate = useNavigate();
@@ -148,6 +149,8 @@ function AddMemberships() {
       value: isUnlimited,
       onChange: (event) => {
         setIsUnlimited(event.target.value);
+        console.log(event.target.value)
+        
       },
     },
     {
@@ -155,7 +158,7 @@ function AddMemberships() {
       name: "validity",
       type: "number",
       value: validity,
-      placeholder: "Validity",
+      placeholder: "Validity (Days)",
       onChange: (event) => {
         setValidity(event.target.value);
       },
@@ -168,9 +171,9 @@ function AddMemberships() {
     const data = new FormData(e.target);
     let receivedData = Object.fromEntries(data.entries());
     const serviceIds = selectedService.map((service) => service._id);
-    receivedData.serviceIds = serviceIds;
+    receivedData.services = selectedService;
     receivedData.isUnlimited = isUnlimited;
-
+    console.log(receivedData)
     if (pathParams.get("id")) {
       axios
         .patch(
@@ -253,11 +256,12 @@ function AddMemberships() {
 
   const addEquipments = (e) => {
     if (selectedServiceName.length > 1 && selectedServiceName !== "Select") {
-      const service = srs.get(selectedServiceName);
+      let service = srs.get(selectedServiceName);
+      service.sessions=parseInt(count);
+      console.log(service)
       setSelectedService([...selectedService, service]);
     }
   };
-
     function removeService(service) {
       const newList = selectedService.filter((li) => li.name !== service.name);
       setSelectedService(newList);
@@ -319,7 +323,6 @@ function AddMemberships() {
           <Input key={inputs[2].id} {...inputs[2]}></Input>
           <Input key={inputs[3].id} {...inputs[3]}></Input>
           <Input key={inputs[4].id} {...inputs[4]}></Input>
-          <Input key={inputs[5].id} {...inputs[5]}></Input>
           <Input key={inputs[7].id} {...inputs[7]}></Input>
           {/* <Input key={inputs[6].id} {...inputs[6]}></Input> */}
           <div style={{margin: 10}} class="flex items-center">
@@ -328,6 +331,11 @@ function AddMemberships() {
               checked={isUnlimited}
               onChange={() => {
                 setIsUnlimited(!isUnlimited);
+                if(!isUnlimited && validity>0){
+                  setCount(validity)
+                }else{
+                  setCount(0)
+                }
               }}
               type="checkbox"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -336,7 +344,7 @@ function AddMemberships() {
               for="checked-checkbox"
               class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-900"
             >
-              Is Unlimited
+              Is Time bound
             </label>
           </div>
         </div>
@@ -370,6 +378,7 @@ function AddMemberships() {
               </div>
             </div>
           </div>
+          <Input key={inputs[5].id} {...inputs[5]}></Input>
           <button
             className="w-[200px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
             type="button"
@@ -394,6 +403,9 @@ function AddMemberships() {
                 <th class="font-bold py-2 px-4 border  border-slate-700 text-left">
                   Price
                 </th>
+                <th class="font-bold py-2 px-4 border  border-slate-700 text-left">
+                  No of Sessions
+                </th>
                 <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Actions
                 </th>
@@ -410,6 +422,9 @@ function AddMemberships() {
                   </td>
                   <td class="border py-2 px-4 border-slate-700 ...">
                     {sr.sellingCost}
+                  </td>
+                  <td class="border py-2 px-4 border-slate-700 ...">
+                    {sr.sessions}
                   </td>
                   <td className="border py-2 px-4 border-slate-700 ...">
                     <button

@@ -361,16 +361,16 @@ function AddPackages() {
           <table className="w-5/6  border">
             <thead>
               <tr>
-                <th className="font-bold py-2 px-4 border-b border-l border-r text-left">
+                <th className="font-bold py-2 px-4 border  border-slate-700 text-left">
                   Service Name
                 </th>
-                <th className="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Duration
                 </th>
-                <th className="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Price
                 </th>
-                <th className="font-bold py-2 px-4 border-b border-l border-r  text-left">
+                <th className="font-bold py-2 px-4 border  border-slate-700  text-left">
                   Actions
                 </th>
               </tr>

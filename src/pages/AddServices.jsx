@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input, Header, InputSelect } from "../form_components";
@@ -7,6 +7,7 @@ import { BsArrowLeftShort } from "react-icons/bs";
 
 function AddServices() {
   const navigate = useNavigate();
+  const [apicalled, setapicalled] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState([]);
   const [userId, setUserId] = React.useState('');
   const [serviceName, setServiceName] = React.useState([]);
@@ -60,6 +61,7 @@ function AddServices() {
           },
         })
         .then((response) => {
+          setapicalled(true);
           setServiceName(response.data.name);
           setServiceCategory(response.data.category);
           setServiceCost(response.data.cost);
@@ -70,6 +72,7 @@ function AddServices() {
           setBranch(response.data.branch);
           setServiceDescription(response.data.description);
           setResourceType(response.data.resourceType);
+          console.log("api called");
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -80,8 +83,8 @@ function AddServices() {
   };
 
   useEffect(() => {
-    getServiceData();
-  }, []);
+    if(!apicalled)getServiceData();
+  }, );
 
   const inputs = [
     {
@@ -109,7 +112,7 @@ function AddServices() {
       id: 3,
       name: "duration",
       type: "number",
-      placeholder: "duration",
+      placeholder: "Duration (min)",
       value: duration,
       onChange: (event) => {
         setDuration(event.target.value);
@@ -155,7 +158,6 @@ function AddServices() {
         setHsnCode(event.target.value);
       },
     },
-    ,
   ];
 
   const handleSubmit = async (e) => {
@@ -282,7 +284,7 @@ function AddServices() {
           <div className=" grid justify-items-stretch grid-cols-2 gap-4">
             <InputSelect
               name="branch"
-              placeholder="branch"
+              placeholder="Branch"
               options={branches}
             ></InputSelect>
             <InputSelect
@@ -293,7 +295,7 @@ function AddServices() {
           </div>
         ) : (
           <div className="pt-4 grid justify-items-stretch grid-cols-2 gap-4">
-            <p className="text-lg text-slate-700">branch: {branch}</p>
+            <p className="text-lg text-slate-700">Branch: {branch}</p>
             <p className="text-lg text-slate-700">
               resourceType: {resourceType}
             </p>

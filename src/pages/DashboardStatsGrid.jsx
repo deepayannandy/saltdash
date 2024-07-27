@@ -1,6 +1,43 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IoBagHandle, IoPieChart, IoPeople, IoCart } from "react-icons/io5";
+import { FaCalendarCheck } from "react-icons/fa";
+import axios from "axios";
+
+
 function DashboardStatsGrid() {
+  const [totalClient, setTotalClient] = React.useState(0);
+  const [totalAppointments, setTotalAppointments] = React.useState(0);
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  const token = localStorage.getItem("userinfo");
+
+  const getClientData = () => {
+    axios
+      .get(`${baseUrl}/api/clients/`, {
+        headers: {
+          "auth-token": token,
+        },
+      })
+      .then((response) => {
+        setTotalClient(response.data.length);
+      });
+  };
+
+  const getTodaysAppointments = () => {
+    axios
+      .get(`${baseUrl}/api/appointments/byday/${new Date().toLocaleDateString("en-US").replaceAll("/","-")}`, {
+        headers: {
+          "auth-token": token,
+        },
+      })
+      .then((response) => {
+        setTotalAppointments(response.data.length);
+      });
+  };
+  useEffect(() => {
+    getClientData();
+    getTodaysAppointments();
+  }, []);
+
   return (
     <div className="flex gap-4 ">
       <BoxWrapper>
@@ -34,20 +71,20 @@ function DashboardStatsGrid() {
         <div className="pl-4">
           <span className="text-sm text-white font-light">Total Customers</span>
           <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">0</strong>
-            <span className="text-sm text-white pl-2">0</span>
+            <strong className="text-xl text-white font-semibold">{totalClient}</strong>
+            {/* <span className="text-sm text-white pl-2">0</span> */}
           </div>
         </div>
       </BoxWrapper>
       <BoxWrapper>
         <div className="rounded-full h-12 w-12 flex items-center justify-center bg-green-600">
-          <IoCart className="text-2xl text-white" />
+          <FaCalendarCheck className="text-2xl text-white" />
         </div>
         <div className="pl-4">
-          <span className="text-sm text-white font-light">Total Orders</span>
+          <span className="text-sm text-white font-light">Total Appointments</span>
           <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">0</strong>
-            <span className="text-sm text-white pl-2">0</span>
+            <strong className="text-xl text-white font-semibold">{totalAppointments}</strong>
+            <span className="text-sm text-white pl-2">Today</span>
           </div>
         </div>
       </BoxWrapper>
