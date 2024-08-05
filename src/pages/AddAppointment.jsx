@@ -486,7 +486,7 @@ function AddAppointment() {
       console.log("I am called")
     }
     console.log(service.sessions)
-    if (service.sessions===0){
+    if (service.sessions===0 && selectedMembership!=="Select"){
       swal("Oho! \nNo more session left for "+service.name, {
         icon: "error",
       });

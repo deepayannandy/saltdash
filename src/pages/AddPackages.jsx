@@ -121,7 +121,7 @@ function AddPackages() {
       id: 2,
       name: "ServiceCost",
       type: "number",
-      placeholder: "serviceCost",
+      placeholder: "Service Cost",
       value: serviceCost,
       onChange: (event) => {
         setServiceCost(event.target.value);
@@ -131,7 +131,7 @@ function AddPackages() {
       id: 3,
       name: "SellingCost",
       type: "number",
-      placeholder: "sellingCost",
+      placeholder: "Selling Cost",
       value: sellingCost,
       onChange: (event) => {
         setSellingCost(event.target.value);
@@ -161,7 +161,7 @@ function AddPackages() {
       id: 6,
       name: "duration",
       type: "number",
-      placeholder: "duration",
+      placeholder: "Duration",
       value: duration,
       onChange: (event) => {
         setDuration(event.target.value);
@@ -319,7 +319,7 @@ function AddPackages() {
         <div className=" grid justify-items-stretch grid-cols-2 gap-4">
           <div>
             <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              className="block  tracking-wide text-gray-700 text-xs font-bold mb-2"
               htmlFor="grid-state"
             >
               Select Service

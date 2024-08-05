@@ -24,7 +24,7 @@ function Services() {
   const navigate = useNavigate();
   const editing = { allowDeleting: true };
   const [serviceData, setServiceData] = React.useState([]);
-  const toolbarOptions = ["Search", "ExcelExport", "PdfExport", "Delete"];
+  const toolbarOptions = ["Search", "ExcelExport", "PdfExport"];
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
   let grid;

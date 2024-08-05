@@ -289,8 +289,8 @@ function AddServices() {
             ></InputSelect>
             <InputSelect
               name="resourceType"
-              placeholder="resourceType"
-              options={["FLOAT TANK", "SALT CAVE", "SAUNA"]}
+              placeholder="Resource Type"
+              options={["FLOAT TANK", "SALT CAVE", "SAUNA","COLD PLUNGE"]}
             ></InputSelect>
           </div>
         ) : (

@@ -24,7 +24,7 @@ function Employees() {
   const [userId, setUserId] = React.useState([]);
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = React.useState([]);
-  const toolbarOptions = ["Search", "ExcelExport", "PdfExport", "Delete"];
+  const toolbarOptions = ["Search", "ExcelExport", "PdfExport",];
   const editing = { allowDeleting: true };
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");

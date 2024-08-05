@@ -341,12 +341,16 @@ function ClientDetails() {
   };
 
   const gridCellInfo = (args) => {
+    if (args.column.field === "ismembership") {
+      args.cell.style.color =args.data.ismembership === "Yes"?"green":"grey";
+    }
     if (args.column.field === "status") {
       args.cell.style.color =
-        args.data.status === "Completed"
+        args.data.status.includes("Completed")
           ? "grey"
-          : args.data.status === "Upcoming"
-          ? "blue"
+          : args.data.status.includes("Upcoming")
+          ? "blue":
+          args.data.status.includes("Cancelled")?"red"
           : "green";
     }
   };
@@ -863,6 +867,11 @@ function ClientDetails() {
                 <ColumnsDirective>
                   {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
                   <ColumnDirective
+                    field="_id"
+                    headerText="Booking Id"
+                    width="80"
+                  />
+                  <ColumnDirective
                     field="title"
                     headerText="Appointment Details"
                     width="80"
@@ -881,7 +890,17 @@ function ClientDetails() {
                   <ColumnDirective
                     field="personCount"
                     headerText="Person Count"
-                    width="100"
+                    width="60"
+                  />
+                  <ColumnDirective
+                    field="rescheduleCount"
+                    headerText="Reschedule Count"
+                    width="60"
+                  />
+                  <ColumnDirective
+                    field="ismembership"
+                    headerText="Membership"
+                    width="60"
                   />
                   <ColumnDirective
                     field="status"

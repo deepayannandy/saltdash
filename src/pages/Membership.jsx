@@ -18,7 +18,7 @@ function Membership() {
   const navigate = useNavigate();
   const editing = { allowDeleting: true };
   const [membershipData, setMembershipData] = React.useState([]);
-  const toolbarOptions = ["Search", "ExcelExport", "PdfExport", "Edit"];
+  const toolbarOptions = ["Search", "ExcelExport", "PdfExport",];
   const token = localStorage.getItem("userinfo");
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   let grid;

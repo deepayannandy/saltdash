@@ -91,7 +91,7 @@ function AddEmployees() {
       id: 2,
       name: "lastName",
       type: "text",
-      placeholder: "lastName",
+      placeholder: "Last Name",
       value: lastName,
       onChange: (event) => {
         setLastName(event.target.value);
@@ -111,7 +111,7 @@ function AddEmployees() {
       id: 4,
       name: "mobile",
       type: "text",
-      placeholder: "mobile",
+      placeholder: "Mobile",
       value: mobile,
       onChange: (event) => {
         setMobile(event.target.value);
