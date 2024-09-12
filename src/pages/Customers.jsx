@@ -20,11 +20,13 @@ import { useNavigate, createSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { closest } from "@syncfusion/ej2-base";
 import swal from "sweetalert";
+import {SyncLoader} from "react-spinners";
 
 function Customers() {
   const navigate = useNavigate();
   const editing = { allowDeleting: true };
   const [clientData, setClientData] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
   const toolbarOptions = ["Search", "ExcelExport", "PdfExport", ];
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -37,6 +39,7 @@ function Customers() {
   });
 
   const getClientData = () => {
+    setIsLoading(true)
     axios
       .get(`${baseUrl}/api/clients/`, {
         headers: {
@@ -45,6 +48,7 @@ function Customers() {
       })
       .then((response) => {
         setClientData(response.data);
+        setIsLoading(false)
       });
   };
 
@@ -140,10 +144,15 @@ function Customers() {
         });
     }
   };
+ 
 
   return (
     <div className="flex-row g gap-2">
-      <div className="flex-direction: column">
+      {isLoading?<div className=" h-screen flex items-center justify-center"> 
+    <SyncLoader color="#00897B" className="" loading={isLoading} size={15}/> 
+    </div>
+    :  <div>
+    <div className="flex-direction: column">
         <span className="p-4 font-weight: inherit; text-2xl">All Clients</span>
         <button
           type="button"
@@ -153,88 +162,91 @@ function Customers() {
           Add New
         </button>
       </div>
-      <div className="flex  mt-4 flex-row gap-2 ">
-        <GridComponent
-          dataSource={clientData}
-          allowPaging={true}
-          ref={(g) => (grid = g)}
-          pageSettings={{ pageSize: 10 }}
-          editSettings={editing}
-          toolbar={toolbarOptions}
-          actionComplete={actionComplete}
-          toolbarClick={toolbarClick}
-          // height= {500}
-          // width= {950}
-          enableInfiniteScrolling={true}
-          infiniteScrollSettings={{ initialBlocks: 5 }}
-          allowResizing={true}
-          recordClick={recordClick}
-        >
-          <ColumnsDirective>
-            {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
-            <ColumnDirective
-              field="firstName"
-              headerText="FirstName"
-              width="100"
-            />
-            <ColumnDirective
-              field="lastName"
-              headerText="LastName"
-              width="80"
-            />
-            <ColumnDirective
-              field="mobileNumber"
-              headerText="Mobile"
-              width="80"
-            />
-            <ColumnDirective field="email" headerText="Email" width="80" />
-            <ColumnDirective field="gender" headerText="Gender" width="100" />
-            <ColumnDirective field="birthDate" headerText="DOB" width="80" />
-            <ColumnDirective
-              field="anniversary"
-              headerText="Anniversary"
-              width="80"
-            />
-            <ColumnDirective
-              field="occupation"
-              headerText="Occupation"
-              width="80"
-            />
-            <ColumnDirective field="type" headerText="ClientType" width="80" />
-            <ColumnDirective
-              field="parentBranchId"
-              headerText="ParentBranchId"
-              width="80"
-            />
-            <ColumnDirective
-              field="_id"
-              headerText="Action"
-              minWidth="100"
-              width="120"
-              maxWidth="300"
-              isPrimaryKey={true}
-              template={showQR}
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[
-              Page,
-              Edit,
-              Toolbar,
-              InfiniteScroll,
-              Resize,
-              Sort,
-              ContextMenu,
-              Filter,
-              ExcelExport,
-              Edit,
-              PdfExport,
-              Search,
-              Resize,
-            ]}
-          />
-        </GridComponent>
-      </div>
+    <div className="flex  mt-4 flex-row gap-2 ">
+    <GridComponent
+      dataSource={clientData}
+      allowPaging={true}
+      ref={(g) => (grid = g)}
+      pageSettings={{ pageSize: 10 }}
+      editSettings={editing}
+      toolbar={toolbarOptions}
+      actionComplete={actionComplete}
+      toolbarClick={toolbarClick}
+      // height= {500}
+      // width= {950}
+      enableInfiniteScrolling={true}
+      infiniteScrollSettings={{ initialBlocks: 5 }}
+      allowResizing={true}
+      recordClick={recordClick}
+    >
+      <ColumnsDirective>
+        {/* <ColumnDirective field='_id' headerText='Service Id' width='80' /> */}
+        <ColumnDirective
+          field="firstName"
+          headerText="FirstName"
+          width="100"
+        />
+        <ColumnDirective
+          field="lastName"
+          headerText="LastName"
+          width="80"
+        />
+        <ColumnDirective
+          field="mobileNumber"
+          headerText="Mobile"
+          width="80"
+        />
+        <ColumnDirective field="email" headerText="Email" width="80" />
+        <ColumnDirective field="gender" headerText="Gender" width="100" />
+        <ColumnDirective field="birthDate" headerText="DOB" width="80" />
+        <ColumnDirective
+          field="anniversary"
+          headerText="Anniversary"
+          width="80"
+        />
+        <ColumnDirective
+          field="occupation"
+          headerText="Occupation"
+          width="80"
+        />
+        <ColumnDirective field="type" headerText="ClientType" width="80" />
+        <ColumnDirective
+          field="parentBranchId"
+          headerText="ParentBranchId"
+          width="80"
+        />
+        <ColumnDirective
+          field="_id"
+          headerText="Action"
+          minWidth="100"
+          width="120"
+          maxWidth="300"
+          isPrimaryKey={true}
+          template={showQR}
+        />
+      </ColumnsDirective>
+      <Inject
+        services={[
+          Page,
+          Edit,
+          Toolbar,
+          InfiniteScroll,
+          Resize,
+          Sort,
+          ContextMenu,
+          Filter,
+          ExcelExport,
+          Edit,
+          PdfExport,
+          Search,
+          Resize,
+        ]}
+      />
+    </GridComponent>
+  </div>
+  </div>
+}
+      
     </div>
   );
 }

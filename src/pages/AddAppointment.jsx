@@ -12,10 +12,12 @@ import swal from "sweetalert";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { format } from "date-fns";
 import _ from "lodash";
+import {SyncLoader} from "react-spinners";
 
 function AddAppointment() {
   const navigate = useNavigate();
   const [errorMessages, setErrorMessages] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [personCount, setPersonCount] = React.useState(1);
   const [clientList, setClientList] = React.useState([]);
   const [membershipList, setMembershipList] = React.useState([]);
@@ -87,6 +89,7 @@ function AddAppointment() {
   }, []);
 
   const getClientList = () => {
+    setIsLoading(true)
     axios
       .get(`${baseUrl}/api/clients/`, {
         headers: {
@@ -94,6 +97,7 @@ function AddAppointment() {
         },
       })
       .then((response) => {
+        setIsLoading(false)
         const clientListData = [];
         for (const client of response.data) {
           clientListData.push({
@@ -124,7 +128,7 @@ function AddAppointment() {
           }
         }
         setClientList(clientListData);
-        
+       
       });
   };
 
@@ -581,7 +585,11 @@ function AddAppointment() {
 
   return (
     <div className="  justify-center">
-      {errorMessages.length > 0 ? (
+      {isLoading?<div className=" h-screen flex items-center justify-center"> 
+    <SyncLoader color="#00897B" className="" loading={isLoading} size={15}/> 
+    </div>
+    :  
+      <div>{errorMessages.length > 0 ? (
         <div
           className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 "
           role="alert"
@@ -733,6 +741,7 @@ function AddAppointment() {
           </button>
         )}
       </form>
+      </div>}
     </div>
   );
 }

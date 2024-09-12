@@ -50,6 +50,7 @@ function ClientDetails() {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [onBoarding, setOnBoarding] = React.useState("");
   const [mobileNumber, setMobileNumber] = React.useState("");
   const [alternate_email, set_alternate_Email] = React.useState([]);
   const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState(
@@ -238,6 +239,7 @@ function ClientDetails() {
           setBillingAddress(response.data.billingAddress);
           set_alternate_MobileNumber(response.data.alternate_mobileNumber);
           set_alternate_Email(response.data.alternate_email);
+          setOnBoarding(response.data.onBoardingDate)
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -597,6 +599,7 @@ function ClientDetails() {
           <Shows placeholder="Anniversary:" value={anniversary} />
           <Shows placeholder="Occupation:" value={occupation} />
           <Shows placeholder="ClientType:" value={clientType} />
+          <Shows placeholder="OnBoardingDate:" value={ new Date(onBoarding).toLocaleDateString("hi-IN")} />
         </div>
         {clientType !== "Individual" ? (
           <div>
