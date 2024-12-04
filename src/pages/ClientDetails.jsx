@@ -29,7 +29,7 @@ import {
   Search,
 } from "@syncfusion/ej2-react-grids";
 import { BsArrowLeftShort } from "react-icons/bs";
-import cCard from "../components/Card";
+import { CardContent } from "@material-ui/core";
 import { TextField } from "@mui/material";
 import { format } from "date-fns";
 import {
@@ -1032,12 +1032,23 @@ function ClientDetails() {
                 Add Note
               </button>
               <br></br>
-              {clientNotes.map((clientNote, index) => (
-                <cCard
-                  note={clientNote.note}
-                  date={clientNote.date}
-                  color={getCardBackgroundColor(index)}
-                />
+              {clientNotes.map((clientNote, index) => ( 
+                 <CardContent
+                 style={{
+                   float: "left",
+                   minWidth: 300,
+                   maxWidth: 300,
+                   minHeight: 200,
+                   backgroundColor: getCardBackgroundColor(index),
+                   borderRadius: "2.5%",
+                   marginRight: "10px",
+                   marginTop: "10px",
+                 }}
+               >
+                 <p style={{ fontSize: 12 }}>{clientNote.date}</p>
+                 <br />
+                 <p>{clientNote.note}</p>
+               </CardContent>
               ))}
             </div>
           ) : (

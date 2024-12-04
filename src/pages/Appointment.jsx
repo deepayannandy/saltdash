@@ -32,8 +32,13 @@ import { InputSearch } from "../form_components";
 import { format, addDays } from "date-fns";
 
 function Appointment() {
+  const firstDateOfMonth = (date = new Date()) =>
+    new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDateOfMonth = (date = new Date()) =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
   const today = new Date();
-  const sevenDaysFromToday = addDays(today, 7);
+  const sevenDaysFromToday = addDays(today, 1);
 
   // Initialize state for start and end dates
   const [startDate, setStartDate] = useState(today);
@@ -41,10 +46,14 @@ function Appointment() {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [isCalendarView, setCalendarView] = useState(true);
+  const [Calandertoday, setCalandertoday] = useState(new Date());
+  const [isApiCalled, setisApiCalled] = useState(false);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
   const currentView = sessionStorage.getItem("currentView");
+
+  
 
   const navigateToAddAppointment = (args) => {
     if (args.startTime >= new Date()) {
@@ -131,7 +140,41 @@ function Appointment() {
 
    const onNavigation = (args) => { 
      sessionStorage.setItem("currentView", args.currentView);
+     if(args.previousDate!=undefined &&  args.currentDate!=args.previousDate)
+      {
+      setCalandertoday(new Date(args.currentDate))
+      console.log(args)
+      setisApiCalled(true);
+      fetchCalanderData(firstDateOfMonth(new Date(args.currentDate)),lastDateOfMonth(new Date(args.currentDate)))
+    }
+     
   } 
+  const fetchCalanderData=(startDate, endDate )=>{
+    console.log(startDate,endDate)
+    let url = `${baseUrl}/api/appointments/searchbyview/${startDate.toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}&${endDate.toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}`;
+    axios
+      .get(url, {
+        headers: {
+          "auth-token": token,
+        },
+      })
+      .then((response) => {
+        const appointment = [];
+        for (const id in response.data) {
+          appointment.push({
+            sid: response.data[id]._id,
+            clientId: response.data[id].clientId,
+            Subject: response.data[id].title,
+            StartTime: new Date(response.data[id].startDateTime),
+            EndTime: new Date(response.data[id].endDateTime),
+            location: response.data[id].branch,
+            cancelAnimationFrame:response.data[id].isCancel
+          });
+        }
+        setAppointments(appointment);
+        setisApiCalled(false);
+      });
+  }
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
@@ -139,8 +182,9 @@ function Appointment() {
     }
   });
 
+
   const getSchedules = (params = {}) => {
-    let url = `${baseUrl}/api/appointments/`;
+    let url = `${baseUrl}/api/appointments/searchbyview/${firstDateOfMonth(new Date()).toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}&${lastDateOfMonth(new Date()).toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}`;
     if (Object.keys(params).length > 0) {
       url = `${baseUrl}/api/appointments/searchbydate/${formatDate(
         params.startDate
@@ -165,6 +209,8 @@ function Appointment() {
           });
         }
         setAppointments(appointment);
+      }).catch((error)=>{
+        console.log(error)
       });
   };
 
@@ -187,7 +233,7 @@ function Appointment() {
 
   // Function to check if a date is 7 or more days from today
   const isDateSelectable = (date) => {
-    const sevenDayFromStartDate = addDays(startDate, 7);
+    const sevenDayFromStartDate = addDays(startDate, 1);
     return date >= sevenDayFromStartDate;
   };
 
@@ -235,9 +281,10 @@ function Appointment() {
         setLocationList(locationArr);
       });
   };
+  
 
   return (
-    <div className="w-full">
+    <div className="w-full h-screen">
       <div className="flex-direction: column">
         <span className="p-4 font-weight: inherit; text-2xl">Appointments</span>
         <button
@@ -269,9 +316,9 @@ function Appointment() {
 
       {isCalendarView ? (
         <ScheduleComponent
-          position={"fixed"}
+          // position={"fixed"}
           overflow={"scroll"}
-          height={"570px"}
+          height={"800px"}
           currentView={currentView}
           timezone="Asia/Calcutta"
           views={["Day", "Week", "Month"]}
@@ -282,10 +329,11 @@ function Appointment() {
             allowDeleting: false,
           }}
           showQuickInfo={false}
-          selectedDate={new Date()}
+          selectedDate={Calandertoday}
           cellClick={navigateToAddAppointment.bind(this)}
           eventClick={handleOnEventClick.bind(this)}
           navigating={(args) => onNavigation(args)}
+
         >
           <Inject services={[Day, Week, Month]} />
         </ScheduleComponent>

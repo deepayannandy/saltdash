@@ -15,7 +15,7 @@ function Header() {
 	}, [])
 	
   return (
-    <div className='sticky top-0 bg-teal-600 h-16 px-4 flex justify-between items-center border-b border-gray-300 z-10'>
+    <div className='sticky top-0 bg-teal-600 h-16 px-4  flex justify-between items-center border-b border-gray-300 z-10'>
       <div className='relative'>
       <HiOutlineSearch fontSize={20} className="text-gray-400 absolute top-1/2 -translate-y-1/2 left-3"/>
         <input type='text' placeholder='Search...'className='text-sm focus:outline-none active:outline-none h-10 w-[15rem] border border-gray-300 rounded-lg pl-11 pr-4'/>

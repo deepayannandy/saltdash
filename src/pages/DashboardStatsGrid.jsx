@@ -12,30 +12,32 @@ function DashboardStatsGrid() {
 
   const getClientData = () => {
     axios
-      .get(`${baseUrl}/api/clients/`, {
+      .get(`${baseUrl}/api/dashboard/`, {
         headers: {
           "auth-token": token,
         },
       })
       .then((response) => {
-        setTotalClient(response.data.length);
+        // console.log(response.data);
+        setTotalClient(response.data.clientCount);
+        setTotalAppointments(response.data.todaysAppointments);
       });
   };
 
-  const getTodaysAppointments = () => {
-    axios
-      .get(`${baseUrl}/api/appointments/byday/${new Date().toLocaleDateString("en-US").replaceAll("/","-")}`, {
-        headers: {
-          "auth-token": token,
-        },
-      })
-      .then((response) => {
-        setTotalAppointments(response.data.length);
-      });
-  };
+  // const getTodaysAppointments = () => {
+  //   axios
+  //     .get(`${baseUrl}/api/appointments/byday/${new Date().toLocaleDateString("en-US").replaceAll("/","-")}`, {
+  //       headers: {
+  //         "auth-token": token,
+  //       },
+  //     })
+  //     .then((response) => {
+  //       setTotalAppointments(response.data.length);
+  //     });
+  // };
   useEffect(() => {
     getClientData();
-    getTodaysAppointments();
+    // getTodaysAppointments();
   }, []);
 
   return (

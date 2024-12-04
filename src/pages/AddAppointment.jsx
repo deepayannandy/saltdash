@@ -17,6 +17,8 @@ import {SyncLoader} from "react-spinners";
 function AddAppointment() {
   const navigate = useNavigate();
   const [errorMessages, setErrorMessages] = React.useState([]);
+  const [disableAction, setDisableAction] = React.useState(false);
+  const [isCancelled, setIsCancelled] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [personCount, setPersonCount] = React.useState(1);
   const [clientList, setClientList] = React.useState([]);
@@ -24,6 +26,8 @@ function AddAppointment() {
   const [servicesList, setServicesList] = React.useState([]);
   const [selectedClient, setSelectedClient] = React.useState("");
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
+  const [cancelledOn, setCancelledOn] = React.useState("");
+  const [cancelledBy, setCancelledBy] = React.useState("");
   const [clientData, setClientData] = React.useState([]);
   const [servicesData, setServicesData] = React.useState([]);
   const [isClientSelected, setIsClientSelected] = React.useState(false);
@@ -90,6 +94,7 @@ function AddAppointment() {
 
   const getClientList = () => {
     setIsLoading(true)
+    pathParams.get("id") === "new"?
     axios
       .get(`${baseUrl}/api/clients/`, {
         headers: {
@@ -129,18 +134,15 @@ function AddAppointment() {
         }
         setClientList(clientListData);
        
-      });
+      }):setIsLoading(false);
   };
 
   const getScheduleData = async () => {
     if (pathParams.get("id") !== "new") {
       try {
         const appointmentResponse = await axios.get(
-          `${baseUrl}/api/appointments/` + pathParams.get("id").toString(),
+          `${baseUrl}/api/appointments/by-appointment/` + pathParams.get("id").toString(),
           {
-            params: {
-              clientId: pathParams.get("clientId").toString(),
-            },
             headers: {
               "auth-token": token,
             },
@@ -148,63 +150,95 @@ function AddAppointment() {
         );
 
         if (appointmentResponse.data) {
+          console.log(appointmentResponse.data)
+          setSelectedClient(
+            { label:appointmentResponse.data.client.firstName +
+              " " +
+              appointmentResponse.data.client.lastName +
+              " (" +
+              appointmentResponse.data.client.mobileNumber +
+              ")",
+              value: appointmentResponse.data.client._id,}
+          )
+          setBranches([appointmentResponse.data.appointmentData.branch])
+          setPersonCount(appointmentResponse.data.appointmentData.personCount)
           const appointmentData = {
             scheduleDate: format(
-              new Date(appointmentResponse.data.startDateTime),
+              new Date(appointmentResponse.data.appointmentData.startDateTime),
               "yyyy-MM-dd"
             ),
             time: format(
-              new Date(appointmentResponse.data.startDateTime),
+              new Date(appointmentResponse.data.appointmentData.startDateTime),
               "HH:mm"
             ),
-            duration: appointmentResponse.data.service.duration,
+            duration: appointmentResponse.data.appointmentData.duration,
           };
-
-          setIsReschedule(true);
-          setPersonCount(appointmentResponse.data.personCount);
-          setLocation(appointmentResponse.data.branch);
-
-          if (pathParams.get("clientId")) {
-            const clientDetails = {
-              label:
-                appointmentResponse.data.client.firstName +
-                " " +
-                appointmentResponse.data.client.lastName +
-                " (" +
-                appointmentResponse.data.client.mobileNumber +
-                ")",
-              value: appointmentResponse.data.client._id,
-            };
-            await handelClientSelect(clientDetails);
-
-            if (appointmentResponse.data.membership) {
-              setIsMembership(true);
-              setSelectedMembership({
-                label: appointmentResponse.data.membership.name,
-                value: appointmentResponse.data.membership._id,
-              });
-            }
-
-            appointmentData.service = {
-              label: appointmentResponse.data.service.name,
-              value: appointmentResponse.data.service._id,
-            };
-
-            setScheduledAppointments([appointmentData]);
-            setLocation(appointmentResponse.data.service);
-            //setDuration(appointmentResponse.data.service.duration);
-            if (appointmentResponse.data.services) {
-              const servicesData = [];
-              for (const service of appointmentResponse.data.services) {
-                servicesData.push({
-                  label: service.name,
-                  value: service._id,
-                });
-              }
-              setServicesList(servicesData);
-            }
+          if(appointmentResponse.data.appointmentData.isCancelled) {
+            setDisableAction(true)
+            setIsCancelled(true)
+            setCancelledOn(appointmentResponse.data.appointmentData.cancelledOn)
+            setCancelledBy(appointmentResponse.data.appointmentData.cancelledBy)
           }
-        }
+          if(appointmentResponse.data.appointmentData.serviceId==="historical Data"){
+            setErrorMessages("On historical data Rescheduling is not possible!")
+            setDisableAction(true)
+            appointmentData.service = {
+              label: appointmentResponse.data.appointmentData.title.split(" for")[0],
+              value: "historical Data",
+            };
+          }else{
+          appointmentData.service = {
+                label: appointmentResponse.data.serviceName.name,
+                value: appointmentResponse.data.serviceName._id,
+              };
+            }
+          setScheduledAppointments([appointmentData])
+          
+          // setIsReschedule(true);
+          // setPersonCount(appointmentResponse.data.appointmentData.personCount);
+          // setLocation(appointmentResponse.data.appointmentData.branch);
+          // console.log(ppointmentResponse.data)
+          // if (pathParams.get("clientId")) {
+          //   const clientDetails = {
+          //     label:
+          //       appointmentResponse.data.client.firstName +
+          //       " " +
+          //       appointmentResponse.data.client.lastName +
+          //       " (" +
+          //       appointmentResponse.data.client.mobileNumber +
+          //       ")",
+          //     value: appointmentResponse.data.client._id,
+          //   };
+          //   await handelClientSelect(clientDetails);
+
+          //   if (appointmentResponse.data.membership) {
+          //     setIsMembership(true);
+          //     setSelectedMembership({
+          //       label: appointmentResponse.data.membership.name,
+          //       value: appointmentResponse.data.membership._id,
+          //     });
+          //   }
+
+          //   appointmentData.service = {
+          //     label: appointmentResponse.data.service.name,
+          //     value: appointmentResponse.data.service._id,
+          //   };
+
+          //   setScheduledAppointments([appointmentData]);
+          //   setLocation(appointmentResponse.data.service);
+          //   //setDuration(appointmentResponse.data.service.duration);
+          //   if (appointmentResponse.data.services) {
+          //     const servicesData = [];
+          //     for (const service of appointmentResponse.data.services) {
+          //       servicesData.push({
+          //         label: service.name,
+          //         value: service._id,
+          //       });
+          //     }
+          //     setServicesList(servicesData);
+          //   }
+          // }
+         }
       } catch (error) {
         swal("Oho! Appointment\n" + error, {
           icon: "error",
@@ -231,7 +265,7 @@ function AddAppointment() {
     e.preventDefault();
     const data = new FormData(e.target);
     const receivedData = Object.fromEntries(data.entries());
-
+    setIsLoading(true)
     const appointmentData = [];
     for (const appointment of scheduledAppointments) {
       if (appointment.duration) {
@@ -256,7 +290,6 @@ function AddAppointment() {
     }
     else{
     const clientName = selectedClient.label;
-
     swal({
       title: "Are you sure?",
       text: `You want to ${
@@ -286,6 +319,7 @@ function AddAppointment() {
               }
             )
             .then(() => {
+              setIsLoading(false)
               swal(
                 "Yes! The appointment for " +
                   clientName +
@@ -297,6 +331,7 @@ function AddAppointment() {
               navigate("/appointment");
             })
             .catch((error) => {
+              setIsLoading(false)
               if (error.response) {
                 setErrorMessages(error.response.data);
                 if (error.response.data["message"] !== undefined) {
@@ -323,6 +358,7 @@ function AddAppointment() {
               }
             )
             .then(() => {
+              setIsLoading(false)
               swal(
                 "Yes! The appointment for " +
                   clientName +
@@ -335,6 +371,7 @@ function AddAppointment() {
               navigate("/appointment");
             })
             .catch((error) => {
+              setIsLoading(false)
               if (error.response) {
                 setErrorMessages(error.response.data);
                 if (error.response.data["message"] !== undefined) {
@@ -348,6 +385,7 @@ function AddAppointment() {
         }
       }
     });
+    
   }
   };
 
@@ -612,11 +650,11 @@ function AddAppointment() {
       />}
         <Header
           title={
-            pathParams.get("id") === "new"
+             pathParams.get("id") === "new"
               ? "Schedule an Appointment"
               : "Reschedule"
           }
-        />
+        /> 
         <div className=" grid justify-items-stretch grid-cols-3 gap-4 pb-4">
           <div className="col-span-2 ...">
             <InputSearch
@@ -625,7 +663,7 @@ function AddAppointment() {
               name="selectedClient"
               placeholder="Client"
               onchange={handelClientSelect}
-              isDisabled={isReschedule}
+              isDisabled={pathParams.get("id") !== "new"?true:false}
             />
           </div>
           {isClientSelected ? (
@@ -652,12 +690,14 @@ function AddAppointment() {
               placeholder="Service"
               options={servicesList}
               value={appointment.service}
+              isDisabled={pathParams.get("id") !== "new"?true:false}
               onchange={(event) => handelServiceSelect(event, appointmentIndex)}
             ></InputSearch>
             <Input
               name="duration"
               type="number"
               placeholder="Duration"
+              disabled={pathParams.get("id") !== "new"?true:false}
               value={appointment.duration}
               onChange={(event) =>
                 handleInputChange(event, "duration", appointmentIndex)
@@ -717,11 +757,39 @@ function AddAppointment() {
             options={branches}
             onchange={handleLocationChange}
           ></InputSelect>
+           
         </div>
+        <div className=" grid justify-items-stretch grid-cols-3 gap-4">
+        {isCancelled?<Input
+              name="Cancelled on"
+              type="text"
+              placeholder="Cancelled on"
+              disabled={true}
+              value={cancelledOn.split("T")[0]}
+            ></Input>
+             :<div/>}
+             {isCancelled?<Input
+              name="Cancelled by"
+              type="text"
+              disabled={true}
+              placeholder="Cancelled by"
+              value={cancelledBy}
+            ></Input>
+             :<div/>}
+              {isCancelled?<Input
+              name="Status"
+              type="text"
+              disabled={true}
+              placeholder="Status"
+              value="Cancelled"
+            ></Input>
+             :<div/>}
+          </div>
 
         <button
-          className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
+          className={disableAction? "w-[400px] my-5 py-2 bg-gray-300  text-white font-semibold rounded-lg":"w-[400px] my-5 py-2  bg-teal-600  text-white font-semibold rounded-lg"}
           type="submit"
+          disabled={disableAction}
         >
           {pathParams.get("id") === "new"
             ? selectedMembership === "Select"
@@ -733,9 +801,10 @@ function AddAppointment() {
           ""
         ) : (
           <button
-            className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
+            className={disableAction? "w-[400px] my-5 py-2  bg-gray-300  text-white font-semibold rounded-lg":"w-[400px] my-5 py-2  bg-teal-600  text-white font-semibold rounded-lg"}
             style={{ margin: 10 }}
-            onClick={deleteMembership}
+            onClick={ deleteMembership}
+            disabled={disableAction}
           >
             Delete
           </button>

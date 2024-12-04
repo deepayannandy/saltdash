@@ -1,6 +1,7 @@
 import { CardContent } from "@material-ui/core";
 
 function Card({ note, date, color }) {
+  console.log(note,date)
   return (
     <CardContent
       style={{
@@ -17,14 +18,6 @@ function Card({ note, date, color }) {
       <p style={{ fontSize: 12 }}>{date}</p>
       <br />
       <p>{note}</p>
-      {/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          adjective
-        </Typography> */}
-      {/* <Typography variant="body2">
-        well meaning and kindly.
-        <br />
-        {'"a benevolent smile"'}
-      </Typography> */}
     </CardContent>
   );
 }
