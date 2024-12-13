@@ -82,6 +82,7 @@ function ClientDetails() {
   const [membershipList, setMembershipList] = React.useState([]);
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
   const [allMembershipData, setAllMembershipData] = React.useState([]);
+  const [emailData, setEmailsData] = React.useState([]);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -103,6 +104,18 @@ function ClientDetails() {
       >
         Delete
       </button>
+    </div>
+  );
+  const showMore = () => (
+    <div className="flex">
+      <button
+        name="buttonShowMore"
+        style={{ background: "#008000" }}
+        className="edititem text-white py-1 px-2  capitalize rounded-2xl text-md"
+      >
+        Show More
+      </button>
+     
     </div>
   );
 
@@ -311,7 +324,11 @@ function ClientDetails() {
     if (tabIndex === 0) {
       getClientMembershipData();
       getMembershipList();
-    } else if (tabIndex === 4) {
+    }else if (tabIndex === 5){
+      console.log("Hello Emails")
+      getEmailsList();
+    }  
+    else if (tabIndex === 4) {
       getClientNotesData();
     }
   }, []);
@@ -327,8 +344,11 @@ function ClientDetails() {
       setStartDate("");
       setEndDate("");
     } else if (newTabIndex === 2) {
-      getAppointmentScheduleData();
-    } else if (newTabIndex === 4) {
+      getAppointmentScheduleData(); 
+    }else if (newTabIndex === 5) {
+      getEmailsList();
+      
+    }  else if (newTabIndex === 4) {
       getClientNotesData();
       setShowNotes(true);
     }
@@ -353,7 +373,7 @@ function ClientDetails() {
           : args.data.status.includes("Upcoming")
           ? "blue":
           args.data.status.includes("Cancelled")?"red"
-          : "green";
+          : "orange";
     }
   };
 
@@ -443,6 +463,19 @@ function ClientDetails() {
         });
       }
       setMembershipList(membershipListData);
+    } catch {
+      swal("Oho! Something went wrong", {
+        icon: "error",
+      });
+    }
+  };
+  const getEmailsList = async () => {
+    console.log("I am called")
+    try {
+      const response = await axios.get(`${baseUrl}/api/emailLogs/${paramsData.get("id").toString()}`, {
+        headers: { "auth-token": token },
+      });
+      setEmailsData(response.data);
     } catch {
       swal("Oho! Something went wrong", {
         icon: "error",
@@ -663,6 +696,7 @@ function ClientDetails() {
             <Tab label="Recent Appointments" />
             <Tab label="Credits" />
             <Tab label="Notes" />
+            <Tab label="Emails" />
           </Tabs>
         </AppBar>
         <div className={tabIndex === 0 ? "visible" : "hidden"}>
@@ -989,6 +1023,7 @@ function ClientDetails() {
                     headerText="Generate on behalf"
                     width="100"
                   />
+                  
                   <ColumnDirective
                     field="_id"
                     headerText="Action"
@@ -997,6 +1032,81 @@ function ClientDetails() {
                     maxWidth="300"
                     isPrimaryKey={true}
                     template={showQR}
+                  />
+                </ColumnsDirective>
+                <Inject
+                  services={[
+                    Page,
+                    Edit,
+                    Toolbar,
+                    InfiniteScroll,
+                    Resize,
+                    Sort,
+                    ContextMenu,
+                    Filter,
+                    ExcelExport,
+                    Edit,
+                    PdfExport,
+                    Search,
+                    Resize,
+                  ]}
+                />
+              </GridComponent>
+            </div>
+          </div>
+        </div>
+        <div className={tabIndex === 5 ? "visible" : "hidden"}>
+          <div className="flex-row g p-2 gap-2">
+            <span className="p-4 font-weight: inherit; text-2xl">
+              Emails
+            </span>
+            <div className="pt-2">
+              {" "}
+              <GridComponent
+                dataSource={emailData}
+                allowPaging={true}
+                ref={(g) => (grid = g)}
+                pageSettings={{ pageSize: 10 }}
+                toolbar={toolbarOptions}
+                // actionComplete={actionComplete}
+                // toolbarClick={toolbarClick}
+                // recordClick={recordClick}
+                // height= {500}
+                // width= {950}
+                enableInfiniteScrolling={true}
+                infiniteScrollSettings={{ initialBlocks: 5 }}
+                allowResizing={true}
+              >
+                <ColumnsDirective>
+                  <ColumnDirective field='bookingId' headerText='Booking Id' width='80' />
+                  <ColumnDirective
+                    field="userEmail"
+                    headerText="Send To"
+                    width="80"
+                  />
+                  <ColumnDirective
+                    field="emailType"
+                    headerText="Email Type"
+                    width="80"
+                  />
+                  <ColumnDirective
+                    field="timeStamp"
+                    headerText="Send Time"
+                    width="120"
+                  />
+                  {/* <ColumnDirective
+                    field="ServiceCategory"
+                    headerText="Subject"
+                    width="80"
+                  /> */}
+                  <ColumnDirective
+                    field="emailBody"
+                    headerText="Action"
+                    minWidth="100"
+                    width="60"
+                    maxWidth="300"
+                    isPrimaryKey={true}
+                    template={showMore}
                   />
                 </ColumnsDirective>
                 <Inject

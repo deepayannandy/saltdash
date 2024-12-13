@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams,createSearchParams } from "react-router-dom";
 import {
   Input,
   Header,
@@ -571,7 +571,7 @@ function AddAppointment() {
     setLocation(event.target.value);
   }
 
-  const deleteMembership = (e) => {
+  const deleteAppointment = (e) => {
     setErrorMessages("");
     e.preventDefault();
 
@@ -620,6 +620,62 @@ function AddAppointment() {
       }
     });
   };
+  const noShow = (e) => {
+    setErrorMessages("");
+    e.preventDefault();
+
+    swal({
+      title: "Are you sure?",
+      text: `You want to make this appointment "No Show"`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((submit) => {
+      if (submit) {
+        axios
+          .delete(`${baseUrl}/api/appointments/noShow/` + pathParams.get("id"), {
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              "auth-token": token,
+            },
+            data: {
+              clientId: selectedClient.value,
+            },
+          })
+          .then(() => {
+            swal(
+              "Yes! The appointment for " +
+                selectedClient.label +
+                " has been deleted",
+              {
+                icon: "success",
+              }
+            );
+            navigate("/appointment");
+          })
+          .catch((error) => {
+            if (error.response) {
+              setErrorMessages(error.response.data);
+              if (error.response.data["message"] !== undefined) {
+                setErrorMessages(error.response.data["message"]);
+                swal("Oho! \n" + error.response.data["message"], {
+                  icon: "error",
+                });
+              }
+            }
+          });
+      }
+    });
+  };
+  const navigateToClient = () => {
+    console.log("Hello I am clicked")
+    navigate({
+      pathname: "/customerdetails",
+      search: createSearchParams({ id: selectedClient.value }).toString(),
+    });
+  }
 
   return (
     <div className="  justify-center">
@@ -653,8 +709,7 @@ function AddAppointment() {
              pathParams.get("id") === "new"
               ? "Schedule an Appointment"
               : "Reschedule"
-          }
-        /> 
+          }></Header>
         <div className=" grid justify-items-stretch grid-cols-3 gap-4 pb-4">
           <div className="col-span-2 ...">
             <InputSearch
@@ -666,6 +721,12 @@ function AddAppointment() {
               isDisabled={pathParams.get("id") !== "new"?true:false}
             />
           </div>
+          {pathParams.get("id") === "new" ? (
+          ""
+        ) : 
+          <button onClick={navigateToClient} id="showMore" class="mt-6  ml-6 bg-transparent hover:bg-green-500 max-h-10 max-w-xs text-green-700 text-xs font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded">
+            Show More
+          </button>}
           {isClientSelected ? (
             isMembership ? (
               <InputSearch
@@ -803,12 +864,23 @@ function AddAppointment() {
           <button
             className={disableAction? "w-[400px] my-5 py-2  bg-gray-300  text-white font-semibold rounded-lg":"w-[400px] my-5 py-2  bg-teal-600  text-white font-semibold rounded-lg"}
             style={{ margin: 10 }}
-            onClick={ deleteMembership}
+            onClick={ deleteAppointment}
             disabled={disableAction}
           >
             Delete
           </button>
         )}
+        {pathParams.get("id") === "new" ? (
+          ""
+        ) : (
+        <button
+            className={disableAction? "w-[400px] my-5 py-2  bg-gray-300  text-white font-semibold rounded-lg":"w-[400px] my-5 py-2  bg-teal-600  text-white font-semibold rounded-lg"}
+            style={{ margin: 10 }}
+            onClick={ noShow}
+            disabled={disableAction}
+          >
+            No Show
+          </button>)}
       </form>
       </div>}
     </div>
