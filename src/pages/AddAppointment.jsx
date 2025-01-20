@@ -835,7 +835,7 @@ function AddAppointment() {
           <Input key={inputs[1].id} {...inputs[1]}></Input>
           <div class="flex items-center">
             <input defaultChecked id="isSendEmail" type="checkbox" value="" onChange={()=>{setsendEmail(!sendEmail)}} class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"></input>
-            <label for="checked-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{!sendEmail?"Send email notification":"Email will not send"}</label>
+            <label for="checked-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Send email notification</label>
           </div>
         </div>
         <div className=" grid justify-items-stretch grid-cols-3 gap-4">
