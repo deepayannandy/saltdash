@@ -12,7 +12,7 @@ const InputSelect = (props) => {
       <div className="relative">
         <select
           name={props.name}
-          onChange={props.onchange}
+          onChange={props.onChange}
           value={props.value}
           className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 mb-2"
           id="grid-state"

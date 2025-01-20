@@ -18,9 +18,11 @@ function AddAppointment() {
   const navigate = useNavigate();
   const [errorMessages, setErrorMessages] = React.useState([]);
   const [disableAction, setDisableAction] = React.useState(false);
+  const [sendEmail, setsendEmail] = React.useState(true);
   const [isCancelled, setIsCancelled] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [personCount, setPersonCount] = React.useState(1);
+  const [CC, setCC] = React.useState("");
   const [clientList, setClientList] = React.useState([]);
   const [membershipList, setMembershipList] = React.useState([]);
   const [servicesList, setServicesList] = React.useState([]);
@@ -258,6 +260,16 @@ function AddAppointment() {
         setPersonCount(event.target.value);
       },
     },
+    {
+      id: 2,
+      name: "cc",
+      type: "text",
+      placeholder: "Email CC",
+      value: CC,
+      onChange: (event) => {
+        setCC(event.target.value);
+      },
+    },
   ];
 
   const handleSubmit = async (e) => {
@@ -309,7 +321,7 @@ function AddAppointment() {
             .post(
               `${baseUrl}/api/appointments/${selectedClient.value}`,
               {
-                appointmentData,
+                appointmentData,CC,sendEmail
               },
               {
                 headers: {
@@ -349,6 +361,7 @@ function AddAppointment() {
               {
                 ...appointmentData[0],
                 clientId: selectedClient.value,
+                CC,sendEmail
               },
               {
                 headers: {
@@ -593,6 +606,7 @@ function AddAppointment() {
             },
             data: {
               clientId: selectedClient.value,
+              CC,sendEmail
             },
           })
           .then(() => {
@@ -809,7 +823,7 @@ function AddAppointment() {
           </div>
         ))}
 
-        <div className=" grid justify-items-stretch grid-cols-3 gap-4">
+        <div className=" grid justify-items-stretch grid-cols-4 gap-4">
           <Input key={inputs[0].id} {...inputs[0]}></Input>
           <InputSelect
             name="location"
@@ -818,7 +832,11 @@ function AddAppointment() {
             options={branches}
             onchange={handleLocationChange}
           ></InputSelect>
-           
+          <Input key={inputs[1].id} {...inputs[1]}></Input>
+          <div class="flex items-center">
+            <input defaultChecked id="isSendEmail" type="checkbox" value="" onChange={()=>{setsendEmail(!sendEmail)}} class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"></input>
+            <label for="checked-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{!sendEmail?"Send email notification":"Email will not send"}</label>
+          </div>
         </div>
         <div className=" grid justify-items-stretch grid-cols-3 gap-4">
         {isCancelled?<Input

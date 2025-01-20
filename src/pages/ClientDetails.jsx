@@ -47,6 +47,7 @@ function ClientDetails() {
   const [clientType, setClientType] = React.useState("Individual");
   const [paramsData] = useSearchParams();
   const [ClientId, setClientId] = React.useState("");
+  const [emailBody, setEmailBody] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -118,7 +119,12 @@ function ClientDetails() {
      
     </div>
   );
-
+  const recordShowMoreClick = (args) => {
+    if (args.target.name === "buttonShowMore") {
+      console.log(args.rowData)
+      setEmailBody(args.rowData.emailBody)
+    }
+  }
   const holdAndResumeActionButtons = () => (
     <div className="flex">
       <button
@@ -1057,9 +1063,18 @@ function ClientDetails() {
         </div>
         <div className={tabIndex === 5 ? "visible" : "hidden"}>
           <div className="flex-row g p-2 gap-2">
+          {emailBody.length>0?<div className="block  p-6 bg-white border border-gray-200 rounded-lg shadow ">
+            <div class="flex justify-between">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 text-teal-600 dark:text-teal-600">Email content</h5>
+            <button type="button" onClick={()=>{setEmailBody("")}} class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Close</button>
+            </div>
+            <div dangerouslySetInnerHTML={{ __html: emailBody }} />
+            </div>:
+            <div>
             <span className="p-4 font-weight: inherit; text-2xl">
               Emails
             </span>
+            
             <div className="pt-2">
               {" "}
               <GridComponent
@@ -1070,7 +1085,7 @@ function ClientDetails() {
                 toolbar={toolbarOptions}
                 // actionComplete={actionComplete}
                 // toolbarClick={toolbarClick}
-                // recordClick={recordClick}
+                recordClick={recordShowMoreClick}
                 // height= {500}
                 // width= {950}
                 enableInfiniteScrolling={true}
@@ -1127,7 +1142,8 @@ function ClientDetails() {
                   ]}
                 />
               </GridComponent>
-            </div>
+              </div>
+            </div>}
           </div>
         </div>
         <div className={tabIndex === 4 ? "visible" : "hidden"}>

@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { Input, Header, InputSelect } from "../form_components";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams,createSearchParams } from "react-router-dom";
 import swal from "sweetalert";
 import { BsArrowLeftShort } from "react-icons/bs";
+import { format } from "date-fns";
 
 function AddClients() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function AddClients() {
   const [alternate_mobileNumber, set_alternate_MobileNumber] = React.useState([]);
   const [mobileNumber, setMobileNumber] = React.useState([]);
   const [birthDate, setBirthDate] = React.useState([]);
+  const [onBoardingDate, setOnBoardingDate] = React.useState(format(new Date(),"yyyy-MM-dd"));
   const [anniversary, setAnniversary] = React.useState([]);
   const [occupation, setOccupation] = React.useState([]);
   const [clientSource, setClientSource] = React.useState([]);
@@ -33,6 +35,7 @@ function AddClients() {
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
+
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
@@ -88,6 +91,7 @@ function AddClients() {
           setSelectedBranch(response.data.parentBranchId);
           set_alternate_MobileNumber(response.data.alternate_mobileNumber)
           set_alternate_Email(response.data.alternate_email);
+          setOnBoardingDate(format(new Date(response.data.onBoardingDate),"yyyy-MM-dd"))
         })
         .catch((error) => {
           swal("Oho! \n" + error, {
@@ -242,6 +246,16 @@ function AddClients() {
         set_alternate_MobileNumber(event.target.value);
       },
     },
+    {
+      id: 15,
+      name: "onBoardingDate",
+      type: "date",
+      placeholder: "Onboarding Date",
+      value: onBoardingDate,
+      onChange: (event) => {
+        setOnBoardingDate(event.target.value);
+      },
+    },
   ];
 
   const handleSubmit = async (e) => {
@@ -257,7 +271,7 @@ function AddClients() {
             "auth-token": token,
           },
         })
-        .then(() => {
+        .then((response) => {
           swal(
             "Yes! " +
               receivedData.firstName +
@@ -266,7 +280,14 @@ function AddClients() {
               icon: "success",
             }
           );
-          navigate("/customers");
+          console.log(">>>>>>>> Create api response",response)
+          setTimeout(function() {
+            navigate({
+              pathname: "/customerdetails",
+              search: createSearchParams({ id: response.data }).toString(),
+            });
+          }, 1000);
+          
         })
         .catch((error) => {
           if (error.response) {
@@ -285,7 +306,7 @@ function AddClients() {
             "auth-token": token,
           },
         })
-        .then(() => {
+        .then((response) => {
           swal(
             "Yes! user data for " +
               receivedData.firstName +
@@ -294,7 +315,12 @@ function AddClients() {
               icon: "success",
             }
           );
-          navigate("/customers");
+          setTimeout(function() {
+            navigate({
+              pathname: "/customerdetails",
+              search: createSearchParams({ id: pathParams.get("id") }).toString(),
+            });
+          }, 1000);
         })
         .catch((error) => {
           if (error.response) {
@@ -355,25 +381,19 @@ function AddClients() {
         <div className=" grid justify-items-stretch grid-cols-3 gap-4">
         <Input key={inputs[4].id} {...inputs[4]}></Input>
           <Input key={inputs[5].id} {...inputs[5]}></Input>
-          {pathParams.get("id") === "new" ? (
             <InputSelect
               name="gender"
               placeholder="Gender"
-              options={["Male", "Female", "Others"]}
-            ></InputSelect>
-          ) : (
-            <Input
-              name="gender"
-              type="text"
-              placeholder="gender"
               value={gender}
-            ></Input>
-          )}
+              onChange={event => {
+                setGender(event.target.value)
+              }}
+              options={["Male", "Female","Not prefer to say", "Others"]}
+            ></InputSelect>
         </div>
         <div className=" grid justify-items-stretch grid-cols-3 gap-4">
           <Input key={inputs[6].id} {...inputs[6]}></Input>
           <Input key={inputs[7].id} {...inputs[7]}></Input>
-          {pathParams.get("id") === "new" ? (
             <div>
               <label
                 class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -383,8 +403,9 @@ function AddClients() {
               </label>
               <div class="relative">
                 <select
-                  name="clientType"
+                  name="type"
                   onChange={setService}
+                  value={clientType}
                   class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 mb-2"
                   id="grid-state"
                 >
@@ -403,14 +424,7 @@ function AddClients() {
                 </div>
               </div>
             </div>
-          ) : (
-            <Input
-              name="type"
-              type="text"
-              placeholder="Client Type"
-              value={clientType}
-            ></Input>
-          )}
+          
         </div>
         {clientType === "Business" ? (
           <div className="grid justify-items-stretch grid-cols-4 gap-4">
@@ -462,6 +476,7 @@ function AddClients() {
               setSelectedBranch(event.target.value);
             }}
           ></InputSelect>
+          <Input key={inputs[14].id} {...inputs[14]}></Input>
         </div>
         <button
           className="w-[400px] my-5 py-2 bg-teal-600  text-white font-semibold rounded-lg"
