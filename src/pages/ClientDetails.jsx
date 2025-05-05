@@ -32,6 +32,7 @@ import { BsArrowLeftShort } from "react-icons/bs";
 import { CardContent } from "@material-ui/core";
 import { TextField } from "@mui/material";
 import { format } from "date-fns";
+import {Modal} from "../components";
 import {
   Card,
   CardBody,
@@ -84,10 +85,16 @@ function ClientDetails() {
   const [selectedMembership, setSelectedMembership] = React.useState("Select");
   const [allMembershipData, setAllMembershipData] = React.useState([]);
   const [emailData, setEmailsData] = React.useState([]);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [selectedM, setSelectedM] = React.useState("NA");
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
 
+  const onModalClose=()=>{ 
+    console.log("Close Modal");
+    setOpenModal(!openModal)
+  }
   const showQR = () => (
     <div className="flex">
       <button
@@ -382,7 +389,21 @@ function ClientDetails() {
           : "orange";
     }
   };
-
+  const handleAdjustment = async (membershipid) => {
+    swal({
+      title: "Are you sure?",
+      text: `You want to adjust the membership balance`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+      closeOnClickOutside: true,
+      closeOnEsc: true,
+    }).then((submit) => {
+      console.log(membershipid,paramsData.get("id").toString());
+      setSelectedM(membershipid);
+      setOpenModal(!openModal)})
+    
+ }
   const handleMembershipRemove= async (membershipid)=>{
     console.log( `lets remove ${membershipid} ${paramsData.get("id").toString()}`)
     swal({
@@ -453,6 +474,7 @@ function ClientDetails() {
         });
      
   };
+ 
 
   const getMembershipList = async () => {
     try {
@@ -594,6 +616,7 @@ function ClientDetails() {
         paddingBottom: "80px",
       }}
     >
+    {openModal?<Modal onClose={onModalClose} header="⚠️ Adjust Subscription" memData={selectedM} cliendtId={paramsData.get("id").toString()}/> :<div/>}
       <div className="col-span-3 border bg-white rounded-md shadow-md p-5 ">
         <BsArrowLeftShort
           style={{ left: "107px" }}
@@ -733,7 +756,7 @@ function ClientDetails() {
                       {membership.description}
                       </Typography>
                       <div className=" mt-2">
-                      {membership.services.map(service=> <div className="flex items-center">Service: {service.name} <span class= {service.sessions<5 ?"bg-blue-100  text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3":"bg-blue-100  text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"}>Qnt: {service.sessions}</span>  </div>)}
+                      {membership.services.map(service=> <div className="flex items-center">Service: {service.name} <span class= {service.sessions<(service.sessions/4) ?"bg-blue-100  text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3":"bg-blue-100  text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"}>Avl: {service.sessions} of {service.totalSessions||"NA"}</span>  </div>)}
                       </div >
                       <div className="grid grid-cols-2 gap-2 mt-1">
                       <div class="flex flex-col items-center justify-center">
@@ -749,6 +772,7 @@ function ClientDetails() {
                         <button  class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pause</button>
                         <button class="py-2 px-4 ms-2 text-sm font-medium text-white focus:outline-none bg-teal-600 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Resume</button>
                         <button onClick={()=>handleMembershipRemove(membership._id)} class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Remove</button>
+                        <button onClick={()=>handleAdjustment(membership)} class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Adjust</button>
                       </div>
                     </CardBody>
                   </Card>
