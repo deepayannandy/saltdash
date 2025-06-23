@@ -24,7 +24,7 @@ function Employees() {
   const [userId, setUserId] = React.useState([]);
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = React.useState([]);
-  const toolbarOptions = ["Search", "ExcelExport", "PdfExport",];
+  const toolbarOptions = ["Search", "ExcelExport", "PdfExport"];
   const editing = { allowDeleting: true };
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
@@ -36,13 +36,15 @@ function Employees() {
   });
 
   const getEmployeeData = () => {
-    axios.get(`${baseUrl}/api/user`, {
-      headers: {
-        "auth-token": token
-      }
-    }).then((response) => {
-      setEmployeeData(response.data);
-    });
+    axios
+      .get(`${baseUrl}/api/user`, {
+        headers: {
+          "auth-token": token,
+        },
+      })
+      .then((response) => {
+        setEmployeeData(response.data);
+      });
   };
 
   useEffect(() => {
@@ -83,7 +85,9 @@ function Employees() {
       swal({
         title: "Are you sure?",
         text:
-          `You want to ${args.rowData.userStatus ? 'deactivate' : 'activate'} `+
+          `You want to ${
+            args.rowData.userStatus ? "deactivate" : "activate"
+          } ` +
           args.rowData.firstName +
           " " +
           args.rowData.lastName,
@@ -209,7 +213,7 @@ function Employees() {
 
   return (
     // <div className="flex flex-row gap-1">
-    <div>
+    <div className="h-screen">
       <div className="flex-direction: column">
         <span className="p-4 font-weight: inherit; text-2xl">All Users</span>
         <button

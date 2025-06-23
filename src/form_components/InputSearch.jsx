@@ -1,5 +1,5 @@
-import React from 'react'
-import Select from 'react-select'
+import React from "react";
+import Select from "react-select";
 const InputSearch = (props) => {
   return (
     <div>
@@ -25,6 +25,6 @@ const InputSearch = (props) => {
       </div>
     </div>
   );
-}
+};
 
-export default InputSearch
+export default InputSearch;

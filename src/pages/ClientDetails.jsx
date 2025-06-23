@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import swal from "sweetalert";
-import { useNavigate, useSearchParams, createSearchParams} from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+  createSearchParams,
+} from "react-router-dom";
 import {
   Header,
   Shows,
@@ -32,7 +36,7 @@ import { BsArrowLeftShort } from "react-icons/bs";
 import { CardContent } from "@material-ui/core";
 import { TextField } from "@mui/material";
 import { format } from "date-fns";
-import {Modal} from "../components";
+import { Modal } from "../components";
 import {
   Card,
   CardBody,
@@ -40,6 +44,8 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
+
+import { LucideEllipsisVertical } from "lucide-react";
 
 function ClientDetails() {
   let grid;
@@ -91,10 +97,10 @@ function ClientDetails() {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem("userinfo");
 
-  const onModalClose=()=>{ 
+  const onModalClose = () => {
     console.log("Close Modal");
-    setOpenModal(!openModal)
-  }
+    setOpenModal(!openModal);
+  };
   const showQR = () => (
     <div className="flex">
       <button
@@ -123,15 +129,14 @@ function ClientDetails() {
       >
         Show More
       </button>
-     
     </div>
   );
   const recordShowMoreClick = (args) => {
     if (args.target.name === "buttonShowMore") {
-      console.log(args.rowData)
-      setEmailBody(args.rowData.emailBody)
+      console.log(args.rowData);
+      setEmailBody(args.rowData.emailBody);
     }
-  }
+  };
   const holdAndResumeActionButtons = () => (
     <div className="flex">
       <button
@@ -161,13 +166,16 @@ function ClientDetails() {
   );
   const recordClick = (args) => {
     if (args.target.name === "buttonreschedule") {
-      console.log(args.rowData)
+      console.log(args.rowData);
       navigate({
         pathname: "/addappointment",
-        search: createSearchParams({ id: args.rowData._id, clientId: args.rowData.clientId, }).toString(),
+        search: createSearchParams({
+          id: args.rowData._id,
+          clientId: args.rowData.clientId,
+        }).toString(),
       });
     }
-  }
+  };
 
   const rescheduleActionButtons = () => (
     <div className="flex">
@@ -244,7 +252,7 @@ function ClientDetails() {
           },
         })
         .then((response) => {
-          setClientId(response.data._id)
+          setClientId(response.data._id);
           setFirstName(response.data.firstName);
           setLastName(response.data.lastName);
           setEmail(response.data.email);
@@ -265,7 +273,7 @@ function ClientDetails() {
           setBillingAddress(response.data.billingAddress);
           set_alternate_MobileNumber(response.data.alternate_mobileNumber);
           set_alternate_Email(response.data.alternate_email);
-          setOnBoarding(response.data.onBoardingDate)
+          setOnBoarding(response.data.onBoardingDate);
         })
         .catch((e) => {
           swal("Oho! \n" + e, {
@@ -280,7 +288,8 @@ function ClientDetails() {
       axios
         .get(
           `${baseUrl}/api/client_memberships/` +
-            paramsData.get("id").toString()+`&all`,
+            paramsData.get("id").toString() +
+            `&all`,
           { headers: { "auth-token": token } }
         )
         .then((response) => {
@@ -337,11 +346,10 @@ function ClientDetails() {
     if (tabIndex === 0) {
       getClientMembershipData();
       getMembershipList();
-    }else if (tabIndex === 5){
-      console.log("Hello Emails")
+    } else if (tabIndex === 5) {
+      console.log("Hello Emails");
       getEmailsList();
-    }  
-    else if (tabIndex === 4) {
+    } else if (tabIndex === 4) {
       getClientNotesData();
     }
   }, []);
@@ -357,11 +365,10 @@ function ClientDetails() {
       setStartDate("");
       setEndDate("");
     } else if (newTabIndex === 2) {
-      getAppointmentScheduleData(); 
-    }else if (newTabIndex === 5) {
+      getAppointmentScheduleData();
+    } else if (newTabIndex === 5) {
       getEmailsList();
-      
-    }  else if (newTabIndex === 4) {
+    } else if (newTabIndex === 4) {
       getClientNotesData();
       setShowNotes(true);
     }
@@ -377,16 +384,17 @@ function ClientDetails() {
 
   const gridCellInfo = (args) => {
     if (args.column.field === "ismembership") {
-      args.cell.style.color =args.data.ismembership === "Yes"?"green":"grey";
+      args.cell.style.color =
+        args.data.ismembership === "Yes" ? "green" : "grey";
     }
     if (args.column.field === "status") {
-      args.cell.style.color =
-        args.data.status.includes("Completed")
-          ? "grey"
-          : args.data.status.includes("Upcoming")
-          ? "blue":
-          args.data.status.includes("Cancelled")?"red"
-          : "orange";
+      args.cell.style.color = args.data.status.includes("Completed")
+        ? "grey"
+        : args.data.status.includes("Upcoming")
+        ? "blue"
+        : args.data.status.includes("Cancelled")
+        ? "red"
+        : "orange";
     }
   };
   const handleAdjustment = async (membershipid) => {
@@ -399,13 +407,15 @@ function ClientDetails() {
       closeOnClickOutside: true,
       closeOnEsc: true,
     }).then((submit) => {
-      console.log(membershipid,paramsData.get("id").toString());
+      console.log(membershipid, paramsData.get("id").toString());
       setSelectedM(membershipid);
-      setOpenModal(!openModal)})
-    
- }
-  const handleMembershipRemove= async (membershipid)=>{
-    console.log( `lets remove ${membershipid} ${paramsData.get("id").toString()}`)
+      setOpenModal(!openModal);
+    });
+  };
+  const handleMembershipRemove = async (membershipid) => {
+    console.log(
+      `lets remove ${membershipid} ${paramsData.get("id").toString()}`
+    );
     swal({
       title: "Are you sure?",
       text: `You want to delete the selected membership`,
@@ -416,65 +426,64 @@ function ClientDetails() {
       closeOnEsc: true,
     }).then((submit) => {
       if (submit) {
-    axios
-    .delete(
-      `${baseUrl}/api/client_memberships/${membershipid}&${paramsData.get("id").toString()}`,
-      {
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-          "auth-token": token,
-        },
+        axios
+          .delete(
+            `${baseUrl}/api/client_memberships/${membershipid}&${paramsData
+              .get("id")
+              .toString()}`,
+            {
+              headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                "auth-token": token,
+              },
+            }
+          )
+          .then(() => {
+            swal("Membership removed successfully", {
+              icon: "success",
+            });
+            getClientMembershipData();
+          })
+          .catch((error) => {
+            swal(error.response?.data ?? error.message, {
+              icon: "failed",
+            });
+          });
       }
-    )
-    .then(() => {
-      swal("Membership removed successfully", {
-        icon: "success",
-      });
-      getClientMembershipData()
-    })
-    .catch((error) => {
-      swal(error.response?.data ?? error.message, {
-        icon: "failed",
-      });
     });
-  }
-    });
-
-  }
+  };
 
   const handleNoteFormSubmit = async (event) => {
     event.preventDefault();
     const formElements = event.currentTarget.elements;
     const formData = { note: formElements.note.value };
-    
-      axios
-        .post(
-          `${baseUrl}/api/notes/` + paramsData.get("id").toString(),
-          formData,
-          {
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-              "auth-token": token,
-            },
-          }
-        )
-        .then(() => {
-          swal("Note added", {
-            icon: "success",
-          });
-          setTabIndex(4);
-          setShowNotes(true);
-          getClientNotesData();
-        })
-        .catch((error) => {
-          swal(error.response?.data ?? error.message, {
-            icon: "failed",
-          });
-          setTabIndex(4);
+
+    axios
+      .post(
+        `${baseUrl}/api/notes/` + paramsData.get("id").toString(),
+        formData,
+        {
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "auth-token": token,
+          },
+        }
+      )
+      .then(() => {
+        swal("Note added", {
+          icon: "success",
         });
-     
+        setTabIndex(4);
+        setShowNotes(true);
+        getClientNotesData();
+      })
+      .catch((error) => {
+        swal(error.response?.data ?? error.message, {
+          icon: "failed",
+        });
+        setTabIndex(4);
+      });
   };
- 
 
   const getMembershipList = async () => {
     try {
@@ -498,11 +507,14 @@ function ClientDetails() {
     }
   };
   const getEmailsList = async () => {
-    console.log("I am called")
+    console.log("I am called");
     try {
-      const response = await axios.get(`${baseUrl}/api/emailLogs/${paramsData.get("id").toString()}`, {
-        headers: { "auth-token": token },
-      });
+      const response = await axios.get(
+        `${baseUrl}/api/emailLogs/${paramsData.get("id").toString()}`,
+        {
+          headers: { "auth-token": token },
+        }
+      );
       setEmailsData(response.data);
     } catch {
       swal("Oho! Something went wrong", {
@@ -576,19 +588,21 @@ function ClientDetails() {
 
   const handleMembershipSelect = (event) => {
     setSelectedMembership(event);
-    const membership = allMembershipData.find((membershipDetails) => membershipDetails._id === event.value);
+    const membership = allMembershipData.find(
+      (membershipDetails) => membershipDetails._id === event.value
+    );
     if (membership) {
       const currentDate = new Date();
       const startDate = format(currentDate, "yyyy-MM-dd");
-      const endDate = membership.validity ? currentDate.setDate(
-        currentDate.getDate() + membership.validity
-      ): currentDate;
+      const endDate = membership.validity
+        ? currentDate.setDate(currentDate.getDate() + membership.validity)
+        : currentDate;
       const formattedEndDate = format(endDate, "yyyy-MM-dd");
       setPaidAmount(membership.sellingCost);
       setStartDate(startDate);
       setEndDate(formattedEndDate);
     }
-  }
+  };
 
   const handleChangeStartDate = (value) => {
     setStartDate(value);
@@ -603,7 +617,7 @@ function ClientDetails() {
       const formattedEndDate = format(endDate, "yyyy-MM-dd");
       setEndDate(formattedEndDate);
     }
-  }
+  };
 
   return (
     <div
@@ -616,7 +630,16 @@ function ClientDetails() {
         paddingBottom: "80px",
       }}
     >
-    {openModal?<Modal onClose={onModalClose} header="⚠️ Adjust Subscription" memData={selectedM} cliendtId={paramsData.get("id").toString()}/> :<div/>}
+      {openModal ? (
+        <Modal
+          onClose={onModalClose}
+          header="⚠️ Adjust Subscription"
+          memData={selectedM}
+          cliendtId={paramsData.get("id").toString()}
+        />
+      ) : (
+        <div />
+      )}
       <div className="col-span-3 border bg-white rounded-md shadow-md p-5 ">
         <BsArrowLeftShort
           style={{ left: "107px" }}
@@ -661,7 +684,10 @@ function ClientDetails() {
           <Shows placeholder="Anniversary:" value={anniversary} />
           <Shows placeholder="Occupation:" value={occupation} />
           <Shows placeholder="ClientType:" value={clientType} />
-          <Shows placeholder="OnBoardingDate:" value={ new Date(onBoarding).toLocaleDateString("hi-IN")} />
+          <Shows
+            placeholder="OnBoardingDate:"
+            value={new Date(onBoarding).toLocaleDateString("hi-IN")}
+          />
         </div>
         {clientType !== "Individual" ? (
           <div>
@@ -704,7 +730,6 @@ function ClientDetails() {
             />
           </div>
           <div>
-
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Billing Address:
             </label>
@@ -716,8 +741,8 @@ function ClientDetails() {
             />
           </div>
         </div>
-        <Divider/>
-        <div className="pt-5"/>
+        <Divider />
+        <div className="pt-5" />
         <AppBar position="static" color="bg-teal-600">
           <Tabs value={tabIndex} onChange={handleTabChange}>
             <Tab label="Memberships" />
@@ -744,40 +769,93 @@ function ClientDetails() {
                   Add Membership
                 </button>
                 <div className="grid grid-cols-3 gap-2">
-                {
-                  membershipData.map(
-                    membership=> <Card className="mt-6 w-96 shadow-[rgba(75,75,75,0.40)_0px_3px_8px]">
-                    <CardBody>
-                      <Typography variant="h5" color="blue-gray" className="mb-2">
-                       {membership.name}
-                      {new Date() < new Date(membership.endDate) ? <span class="bg-blue-100 text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-teal-800 ms-3">Active</span>:  <span class="bg-blue-100 text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-red-600 ms-3">Exp</span>}
-                      </Typography>
-                      <Typography>
-                      {membership.description}
-                      </Typography>
-                      <div className=" mt-2">
-                      {membership.services.map(service=> <div className="flex items-center">Service: {service.name} <span class= {service.sessions<(service.sessions/4) ?"bg-blue-100  text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3":"bg-blue-100  text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"}>Avl: {service.sessions} of {service.totalSessions||"NA"}</span>  </div>)}
-                      </div >
-                      <div className="grid grid-cols-2 gap-2 mt-1">
-                      <div class="flex flex-col items-center justify-center">
-                        <dt class="mb-1 text-1xl font-extrabold">{membership.startDate.split("T")[0]}</dt>
-                        <dd class="text-gray-500 dark:text-gray-400">Start Date</dd>
-                      </div>
-                      <div class="flex flex-col items-center justify-center">
-                        <dt class="mb-1 text-1xl font-extrabold">{membership.endDate.split("T")[0]}</dt>
-                        <dd class="text-gray-500 dark:text-gray-400">End Date</dd>
-                      </div>
-                      </div>
-                      <div class="flex mt-4 md:mt-6">
-                        <button  class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pause</button>
-                        <button class="py-2 px-4 ms-2 text-sm font-medium text-white focus:outline-none bg-teal-600 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Resume</button>
-                        <button onClick={()=>handleMembershipRemove(membership._id)} class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Remove</button>
-                        <button onClick={()=>handleAdjustment(membership)} class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Adjust</button>
-                      </div>
-                    </CardBody>
-                  </Card>
-                  )
-                }
+                  {membershipData.map((membership) => (
+                    <Card className="mt-6 w-96 shadow-[rgba(75,75,75,0.40)_0px_3px_8px]">
+                      <CardBody>
+                        <div className="flex justify-between">
+                          <Typography
+                            variant="h5"
+                            color="blue-gray"
+                            className="mb-2"
+                          >
+                            {membership.name}
+                            {new Date() < new Date(membership.endDate) ? (
+                              <span class="bg-blue-100 text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-teal-800 ms-3">
+                                Active
+                              </span>
+                            ) : (
+                              <span class="bg-blue-100 text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-red-600 ms-3">
+                                Exp
+                              </span>
+                            )}
+                          </Typography>
+                        </div>
+                        <Typography>{membership.description}</Typography>
+                        <div className=" mt-2">
+                          {membership.services.map((service) => (
+                            <div className="flex items-center">
+                              Service: {service.name}{" "}
+                              <span
+                                class={
+                                  service.sessions < service.sessions / 4
+                                    ? "bg-blue-100  text-red-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"
+                                    : "bg-blue-100  text-teal-600 text-xs font-semibold px-2.5 py-0.5 rounded  ms-3"
+                                }
+                              >
+                                Avl: {service.sessions} of{" "}
+                                {service.totalSessions || "NA"}
+                              </span>{" "}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div class="flex flex-col items-center justify-center">
+                            <dt class="mb-1 text-1xl font-extrabold">
+                              {membership.startDate.split("T")[0]}
+                            </dt>
+                            <dd class="text-gray-500 dark:text-gray-400">
+                              Start Date
+                            </dd>
+                          </div>
+                          <div class="flex flex-col items-center justify-center">
+                            <span class="line-through text-xs text-gray-500">
+                              {membership.oldEndDate
+                                ? `${membership.oldEndDate.split("T")[0]}`
+                                : ""}
+                            </span>
+                            <dt class="mb-1 text-1xl font-extrabold">
+                              {`${membership.endDate.split("T")[0]}`}
+                            </dt>
+                            <dd class="text-gray-500 dark:text-gray-400">
+                              End Date
+                            </dd>
+                          </div>
+                        </div>
+                        <div class="flex mt-4 md:mt-6">
+                          <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Pause
+                          </button>
+                          <button class="py-2 px-4 ms-2 text-sm font-medium text-white focus:outline-none bg-teal-600 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            Resume
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleMembershipRemove(membership._id)
+                            }
+                            class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                          >
+                            Remove
+                          </button>
+                          <button
+                            onClick={() => handleAdjustment(membership)}
+                            class="py-2 px-4 ms-2 text-sm font-medium text-red-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                          >
+                            Adjust
+                          </button>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  ))}
                 </div>
               </div>
             ) : (
@@ -1053,7 +1131,7 @@ function ClientDetails() {
                     headerText="Generate on behalf"
                     width="100"
                   />
-                  
+
                   <ColumnDirective
                     field="_id"
                     headerText="Action"
@@ -1087,87 +1165,104 @@ function ClientDetails() {
         </div>
         <div className={tabIndex === 5 ? "visible" : "hidden"}>
           <div className="flex-row g p-2 gap-2">
-          {emailBody.length>0?<div className="block  p-6 bg-white border border-gray-200 rounded-lg shadow ">
-            <div class="flex justify-between">
-            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 text-teal-600 dark:text-teal-600">Email content</h5>
-            <button type="button" onClick={()=>{setEmailBody("")}} class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Close</button>
-            </div>
-            <div dangerouslySetInnerHTML={{ __html: emailBody }} />
-            </div>:
-            <div>
-            <span className="p-4 font-weight: inherit; text-2xl">
-              Emails
-            </span>
-            
-            <div className="pt-2">
-              {" "}
-              <GridComponent
-                dataSource={emailData}
-                allowPaging={true}
-                ref={(g) => (grid = g)}
-                pageSettings={{ pageSize: 10 }}
-                toolbar={toolbarOptions}
-                // actionComplete={actionComplete}
-                // toolbarClick={toolbarClick}
-                recordClick={recordShowMoreClick}
-                // height= {500}
-                // width= {950}
-                enableInfiniteScrolling={true}
-                infiniteScrollSettings={{ initialBlocks: 5 }}
-                allowResizing={true}
-              >
-                <ColumnsDirective>
-                  <ColumnDirective field='bookingId' headerText='Booking Id' width='80' />
-                  <ColumnDirective
-                    field="userEmail"
-                    headerText="Send To"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="emailType"
-                    headerText="Email Type"
-                    width="80"
-                  />
-                  <ColumnDirective
-                    field="timeStamp"
-                    headerText="Send Time"
-                    width="120"
-                  />
-                  {/* <ColumnDirective
+            {emailBody.length > 0 ? (
+              <div className="block  p-6 bg-white border border-gray-200 rounded-lg shadow ">
+                <div class="flex justify-between">
+                  <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 text-teal-600 dark:text-teal-600">
+                    Email content
+                  </h5>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailBody("");
+                    }}
+                    class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                  >
+                    Close
+                  </button>
+                </div>
+                <div dangerouslySetInnerHTML={{ __html: emailBody }} />
+              </div>
+            ) : (
+              <div>
+                <span className="p-4 font-weight: inherit; text-2xl">
+                  Emails
+                </span>
+
+                <div className="pt-2">
+                  {" "}
+                  <GridComponent
+                    dataSource={emailData}
+                    allowPaging={true}
+                    ref={(g) => (grid = g)}
+                    pageSettings={{ pageSize: 10 }}
+                    toolbar={toolbarOptions}
+                    // actionComplete={actionComplete}
+                    // toolbarClick={toolbarClick}
+                    recordClick={recordShowMoreClick}
+                    // height= {500}
+                    // width= {950}
+                    enableInfiniteScrolling={true}
+                    infiniteScrollSettings={{ initialBlocks: 5 }}
+                    allowResizing={true}
+                  >
+                    <ColumnsDirective>
+                      <ColumnDirective
+                        field="bookingId"
+                        headerText="Booking Id"
+                        width="80"
+                      />
+                      <ColumnDirective
+                        field="userEmail"
+                        headerText="Send To"
+                        width="80"
+                      />
+                      <ColumnDirective
+                        field="emailType"
+                        headerText="Email Type"
+                        width="80"
+                      />
+                      <ColumnDirective
+                        field="timeStamp"
+                        headerText="Send Time"
+                        width="120"
+                      />
+                      {/* <ColumnDirective
                     field="ServiceCategory"
                     headerText="Subject"
                     width="80"
                   /> */}
-                  <ColumnDirective
-                    field="emailBody"
-                    headerText="Action"
-                    minWidth="100"
-                    width="60"
-                    maxWidth="300"
-                    isPrimaryKey={true}
-                    template={showMore}
-                  />
-                </ColumnsDirective>
-                <Inject
-                  services={[
-                    Page,
-                    Edit,
-                    Toolbar,
-                    InfiniteScroll,
-                    Resize,
-                    Sort,
-                    ContextMenu,
-                    Filter,
-                    ExcelExport,
-                    Edit,
-                    PdfExport,
-                    Search,
-                    Resize,
-                  ]}
-                />
-              </GridComponent>
+                      <ColumnDirective
+                        field="emailBody"
+                        headerText="Action"
+                        minWidth="100"
+                        width="60"
+                        maxWidth="300"
+                        isPrimaryKey={true}
+                        template={showMore}
+                      />
+                    </ColumnsDirective>
+                    <Inject
+                      services={[
+                        Page,
+                        Edit,
+                        Toolbar,
+                        InfiniteScroll,
+                        Resize,
+                        Sort,
+                        ContextMenu,
+                        Filter,
+                        ExcelExport,
+                        Edit,
+                        PdfExport,
+                        Search,
+                        Resize,
+                      ]}
+                    />
+                  </GridComponent>
+                </div>
               </div>
-            </div>}
+            )}
           </div>
         </div>
         <div className={tabIndex === 4 ? "visible" : "hidden"}>
@@ -1182,23 +1277,23 @@ function ClientDetails() {
                 Add Note
               </button>
               <br></br>
-              {clientNotes.map((clientNote, index) => ( 
-                 <CardContent
-                 style={{
-                   float: "left",
-                   minWidth: 300,
-                   maxWidth: 300,
-                   minHeight: 200,
-                   backgroundColor: getCardBackgroundColor(index),
-                   borderRadius: "2.5%",
-                   marginRight: "10px",
-                   marginTop: "10px",
-                 }}
-               >
-                 <p style={{ fontSize: 12 }}>{clientNote.date}</p>
-                 <br />
-                 <p>{clientNote.note}</p>
-               </CardContent>
+              {clientNotes.map((clientNote, index) => (
+                <CardContent
+                  style={{
+                    float: "left",
+                    minWidth: 300,
+                    maxWidth: 300,
+                    minHeight: 200,
+                    backgroundColor: getCardBackgroundColor(index),
+                    borderRadius: "2.5%",
+                    marginRight: "10px",
+                    marginTop: "10px",
+                  }}
+                >
+                  <p style={{ fontSize: 12 }}>{clientNote.date}</p>
+                  <br />
+                  <p>{clientNote.note}</p>
+                </CardContent>
               ))}
             </div>
           ) : (

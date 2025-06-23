@@ -3,7 +3,6 @@ import { IoBagHandle, IoPieChart, IoPeople, IoCart } from "react-icons/io5";
 import { FaCalendarCheck } from "react-icons/fa";
 import axios from "axios";
 
-
 function DashboardStatsGrid() {
   const [totalClient, setTotalClient] = React.useState(0);
   const [totalAppointments, setTotalAppointments] = React.useState(0);
@@ -41,55 +40,67 @@ function DashboardStatsGrid() {
   }, []);
 
   return (
-    <div className="flex gap-4 ">
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-sky-500">
-          <IoBagHandle className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-white font-light">Total Sales</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">₹0</strong>
-            <span className="text-sm text-white pl-2">0</span>
+    <div className=" h-screen ">
+      <div className="flex gap-4">
+        <BoxWrapper>
+          <div className="rounded-full h-12 w-12 flex items-center justify-center bg-sky-500">
+            <IoBagHandle className="text-2xl text-white" />
           </div>
-        </div>
-      </BoxWrapper>
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-red-600">
-          <IoPieChart className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-white font-light">Total Expenses</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">₹0</strong>
-            <span className="text-sm text-white pl-2">0</span>
+          <div className="pl-4">
+            <span className="text-sm text-white font-light">Total Sales</span>
+            <div className="flex items-center">
+              <strong className="text-xl text-white font-semibold">₹0</strong>
+              <span className="text-sm text-white pl-2">0</span>
+            </div>
           </div>
-        </div>
-      </BoxWrapper>
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-yellow-400">
-          <IoPeople className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-white font-light">Total Customers</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">{totalClient}</strong>
-            {/* <span className="text-sm text-white pl-2">0</span> */}
+        </BoxWrapper>
+        <BoxWrapper>
+          <div className="rounded-full h-12 w-12 flex items-center justify-center bg-red-600">
+            <IoPieChart className="text-2xl text-white" />
           </div>
-        </div>
-      </BoxWrapper>
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-green-600">
-          <FaCalendarCheck className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-white font-light">Total Appointments</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-white font-semibold">{totalAppointments}</strong>
-            <span className="text-sm text-white pl-2">Today</span>
+          <div className="pl-4">
+            <span className="text-sm text-white font-light">
+              Total Expenses
+            </span>
+            <div className="flex items-center">
+              <strong className="text-xl text-white font-semibold">₹0</strong>
+              <span className="text-sm text-white pl-2">0</span>
+            </div>
           </div>
-        </div>
-      </BoxWrapper>
+        </BoxWrapper>
+        <BoxWrapper>
+          <div className="rounded-full h-12 w-12 flex items-center justify-center bg-yellow-400">
+            <IoPeople className="text-2xl text-white" />
+          </div>
+          <div className="pl-4">
+            <span className="text-sm text-white font-light">
+              Total Customers
+            </span>
+            <div className="flex items-center">
+              <strong className="text-xl text-white font-semibold">
+                {totalClient}
+              </strong>
+              {/* <span className="text-sm text-white pl-2">0</span> */}
+            </div>
+          </div>
+        </BoxWrapper>
+        <BoxWrapper>
+          <div className="rounded-full h-12 w-12 flex items-center justify-center bg-green-600">
+            <FaCalendarCheck className="text-2xl text-white" />
+          </div>
+          <div className="pl-4">
+            <span className="text-sm text-white font-light">
+              Total Appointments
+            </span>
+            <div className="flex items-center">
+              <strong className="text-xl text-white font-semibold">
+                {totalAppointments}
+              </strong>
+              <span className="text-sm text-white pl-2">Today</span>
+            </div>
+          </div>
+        </BoxWrapper>
+      </div>
     </div>
   );
 }
