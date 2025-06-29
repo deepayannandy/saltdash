@@ -8,6 +8,7 @@ import {
   HiCalendar,
   HiOutlineLogout,
 } from "react-icons/hi";
+import { BsCalculator } from "react-icons/bs";
 import { IoFunnelSharp } from "react-icons/io5";
 
 export const DASHBOARD_SIDEBAR_LINKS = [
@@ -16,6 +17,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     label: "Dashboard",
     path: "/dashboard",
     icon: <HiOutlineViewGrid />,
+  },
+  {
+    key: "sales",
+    label: "POS",
+    path: "/pos",
+    icon: <BsCalculator />,
   },
   {
     key: "services",
@@ -53,6 +60,7 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     path: "/leads",
     icon: <IoFunnelSharp />,
   },
+
   // {
   // 	key: 'products',
   // 	label: 'Products',
