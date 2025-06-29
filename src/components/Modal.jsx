@@ -41,7 +41,10 @@ const Modal = (prop) => {
     console.log("THIS IS SERVICESSSSSS", services[index].sessions);
     let updatedService = services;
     console.log("THIS IS VALUEEE", value);
-    if (value > 0 && value < updatedService[i].totalSessions + 1) {
+    if (!updatedService[i].totalSessions) {
+      updatedService[i].totalSessions = updatedService[i].sessions;
+    }
+    if (value > -1 && value < updatedService[i].totalSessions + 1) {
       updatedService[i].sessions = value;
       setServices([...updatedService]);
     }
@@ -118,7 +121,7 @@ const Modal = (prop) => {
                   <Input
                     type="number"
                     name={i}
-                    id="wheelDiameter"
+                    id={`count${i}`}
                     onChange={(e) => {
                       handleChange(e, i);
                     }}
