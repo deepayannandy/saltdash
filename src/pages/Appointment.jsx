@@ -53,8 +53,6 @@ function Appointment() {
   const token = localStorage.getItem("userinfo");
   const currentView = sessionStorage.getItem("currentView");
 
-  
-
   const navigateToAddAppointment = (args) => {
     if (args.startTime >= new Date()) {
       navigate({
@@ -64,7 +62,7 @@ function Appointment() {
           startTime: args.startTime,
         }).toString(),
       });
-    } else if(args.startTime){
+    } else if (args.startTime) {
       swal({
         title: "Are you sure?",
         text: "You want to add appointment for past date",
@@ -138,20 +136,30 @@ function Appointment() {
     }
   };
 
-   const onNavigation = (args) => { 
-     sessionStorage.setItem("currentView", args.currentView);
-     if(args.previousDate!=undefined &&  args.currentDate!=args.previousDate)
-      {
-      setCalandertoday(new Date(args.currentDate))
-      console.log(args)
+  const onNavigation = (args) => {
+    sessionStorage.setItem("currentView", args.currentView);
+    if (
+      args.previousDate != undefined &&
+      args.currentDate != args.previousDate
+    ) {
+      setCalandertoday(new Date(args.currentDate));
+      console.log(args);
       setisApiCalled(true);
-      fetchCalanderData(firstDateOfMonth(new Date(args.currentDate)),lastDateOfMonth(new Date(args.currentDate)))
+      fetchCalanderData(
+        firstDateOfMonth(new Date(args.currentDate)),
+        lastDateOfMonth(new Date(args.currentDate))
+      );
     }
-     
-  } 
-  const fetchCalanderData=(startDate, endDate )=>{
-    console.log(startDate,endDate)
-    let url = `${baseUrl}/api/appointments/searchbyview/${startDate.toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}&${endDate.toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}`;
+  };
+  const fetchCalanderData = (startDate, endDate) => {
+    console.log(startDate, endDate);
+    let url = `${baseUrl}/api/appointments/searchbyview/${startDate
+      .toLocaleString("en-IN")
+      .split(",")[0]
+      .replaceAll("/", "-")}&${endDate
+      .toLocaleString("en-IN")
+      .split(",")[0]
+      .replaceAll("/", "-")}`;
     axios
       .get(url, {
         headers: {
@@ -168,13 +176,13 @@ function Appointment() {
             StartTime: new Date(response.data[id].startDateTime),
             EndTime: new Date(response.data[id].endDateTime),
             location: response.data[id].branch,
-            cancelAnimationFrame:response.data[id].isCancel
+            cancelAnimationFrame: response.data[id].isCancel,
           });
         }
         setAppointments(appointment);
         setisApiCalled(false);
       });
-  }
+  };
 
   useEffect(() => {
     if (!localStorage.getItem("userinfo")) {
@@ -182,9 +190,16 @@ function Appointment() {
     }
   });
 
-
   const getSchedules = (params = {}) => {
-    let url = `${baseUrl}/api/appointments/searchbyview/${firstDateOfMonth(new Date()).toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}&${lastDateOfMonth(new Date()).toLocaleString("en-IN").split(",")[0].replaceAll("/","-")}`;
+    let url = `${baseUrl}/api/appointments/searchbyview/${firstDateOfMonth(
+      new Date()
+    )
+      .toLocaleString("en-IN")
+      .split(",")[0]
+      .replaceAll("/", "-")}&${lastDateOfMonth(new Date())
+      .toLocaleString("en-IN")
+      .split(",")[0]
+      .replaceAll("/", "-")}`;
     if (Object.keys(params).length > 0) {
       url = `${baseUrl}/api/appointments/searchbydate/${formatDate(
         params.startDate
@@ -209,8 +224,9 @@ function Appointment() {
           });
         }
         setAppointments(appointment);
-      }).catch((error)=>{
-        console.log(error)
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -281,7 +297,6 @@ function Appointment() {
         setLocationList(locationArr);
       });
   };
-  
 
   return (
     <div className="w-full h-screen">
@@ -333,7 +348,6 @@ function Appointment() {
           cellClick={navigateToAddAppointment.bind(this)}
           eventClick={handleOnEventClick.bind(this)}
           navigating={(args) => onNavigation(args)}
-
         >
           <Inject services={[Day, Week, Month]} />
         </ScheduleComponent>

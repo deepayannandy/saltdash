@@ -25,6 +25,25 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     icon: <BsCalculator />,
   },
   {
+    key: "appointment",
+    label: "Appointment",
+    path: "/appointment",
+    icon: <HiCalendar />,
+  },
+  {
+    key: "leadboard",
+    label: "Leads",
+    path: "/leads",
+    icon: <IoFunnelSharp />,
+  },
+  {
+    key: "customers",
+    label: "Clients",
+    path: "/customers",
+    icon: <HiOutlineUsers />,
+  },
+
+  {
     key: "services",
     label: "Services",
     path: "/services",
@@ -47,18 +66,6 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     label: "Users",
     path: "/employees",
     icon: <HiUserGroup />,
-  },
-  {
-    key: "customers",
-    label: "Clients",
-    path: "/customers",
-    icon: <HiOutlineUsers />,
-  },
-  {
-    key: "leadboard",
-    label: "Leads",
-    path: "/leads",
-    icon: <IoFunnelSharp />,
   },
 
   // {
@@ -91,12 +98,6 @@ export const DASHBOARD_SIDEBAR_LINKS = [
   // 	path: '/resources',
   // 	icon: <HiViewBoards />
   // },
-  {
-    key: "appointment",
-    label: "Appointment",
-    path: "/appointment",
-    icon: <HiCalendar />,
-  },
 ];
 
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [

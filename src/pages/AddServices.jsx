@@ -9,7 +9,7 @@ function AddServices() {
   const navigate = useNavigate();
   const [apicalled, setapicalled] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState([]);
-  const [userId, setUserId] = React.useState('');
+  const [userId, setUserId] = React.useState("");
   const [serviceName, setServiceName] = React.useState([]);
   const [serviceCategory, setServiceCategory] = React.useState([]);
   const [duration, setDuration] = React.useState([]);
@@ -83,8 +83,8 @@ function AddServices() {
   };
 
   useEffect(() => {
-    if(!apicalled)getServiceData();
-  }, );
+    if (!apicalled) getServiceData();
+  });
 
   const inputs = [
     {
@@ -290,7 +290,15 @@ function AddServices() {
             <InputSelect
               name="resourceType"
               placeholder="Resource Type"
-              options={["FLOAT TANK", "SALT CAVE", "SAUNA","COLD PLUNGE","Consult 1","Consult 2","Event"]}
+              options={[
+                "FLOAT TANK",
+                "SALT CAVE",
+                "SAUNA",
+                "COLD PLUNGE",
+                "RED LIGHT THERAPY",
+                "Consult 2",
+                "Event",
+              ]}
             ></InputSelect>
           </div>
         ) : (
