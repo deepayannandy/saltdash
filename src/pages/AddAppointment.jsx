@@ -600,20 +600,26 @@ function AddAppointment() {
   }
 
   function handelServiceSelect(event, appointmentIndex) {
+    console.log(event.value);
     const newScheduleAppointments = [...scheduledAppointments];
     newScheduleAppointments[appointmentIndex]["service"] = event;
 
     let service;
     if (isMembership) {
-      if (clientData.clientMemberships) {
-        for (const clientMembership of clientData.clientMemberships) {
-          service = clientMembership.services.find(
-            (service) => service._id === event.value
-          );
-          if (service) {
-            break;
-          }
-        }
+      //new logic
+      if (selectedMembershipDetails) {
+        service = selectedMembershipDetails.services.find(
+          (service) => service._id === event.value
+        );
+
+        // for (const clientMembership of clientData.clientMemberships) {
+        //   service = clientMembership.services.find(
+        //     (service) => service._id === event.value
+        //   );
+        //   if (service) {
+        //     break;
+        //   }
+        // }
       }
     }
 
@@ -621,7 +627,7 @@ function AddAppointment() {
       service = servicesData.find((service) => service._id === event.value);
       console.log("I am called");
     }
-    console.log(service.sessions);
+    console.log(service.sessions, service._id);
     if (service.sessions === 0 && selectedMembership !== "Select") {
       swal("Oho! \nNo more session left for " + service.name, {
         icon: "error",
